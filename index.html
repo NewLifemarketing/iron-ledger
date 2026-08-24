@@ -676,6 +676,7 @@ main{ flex:1 1 auto; min-width:0; padding-bottom:calc(var(--tab-h) + env(safe-ar
 
 
 
+
 /* ============================================================
    PHYSIQUE — figures, body map, character customiser
    ============================================================ */
@@ -766,10 +767,11 @@ main{ flex:1 1 auto; min-width:0; padding-bottom:calc(var(--tab-h) + env(safe-ar
 }
 .ccard .cmark svg{ width:12px; height:12px; }
 
-/* He is never quite still. One four-frame loop drives every place the
-   character appears — the header, the rail, the sign-in stage. The resting
-   frame is last so a page with animations disabled still shows a pose. */
-.greeter, .rf-stage{ position:relative; display:block; }
+/* The routine. Seven stacked frames cross-faded on one 12s loop: he waves you
+   in, then runs front double bi, abs and thighs, rear double bi, most muscular,
+   and stands back down. The resting frame is first so a page with animations
+   disabled still shows him standing rather than blank. */
+.greeter, .rf-stage, .st-fig{ position:relative; display:block; }
 .greeter{ flex:0 0 auto; padding:0; }
 .gf{
   position:absolute; inset:0; opacity:0;
@@ -777,26 +779,32 @@ main{ flex:1 1 auto; min-width:0; padding-bottom:calc(var(--tab-h) + env(safe-ar
 }
 .gf > svg{ display:block; }
 .g0{ opacity:1; }
-.loop{ animation:gbob 3.4s ease-in-out infinite; }
-.loop .g0{ animation:gwA 5.6s linear infinite; }
-.loop .g1{ animation:gwB 5.6s linear infinite; }
-.loop .g2{ animation:gwC 5.6s linear infinite; }
-.loop .g3{ animation:gwD 5.6s linear infinite; }
+.loop{ animation:gbob 4.1s ease-in-out infinite; }
+.loop .g0{ animation:gwA 12s linear infinite; }
+.loop .g1{ animation:gwB 12s linear infinite; }
+.loop .g2{ animation:gwC 12s linear infinite; }
+.loop .g3{ animation:gwD 12s linear infinite; }
+.loop .g4{ animation:gwE 12s linear infinite; }
+.loop .g5{ animation:gwF 12s linear infinite; }
+.loop .g6{ animation:gwG 12s linear infinite; }
 @keyframes gbob{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-2px) } }
-@keyframes gwA{ 0%,17%{ opacity:1 } 19%,81%{ opacity:0 } 83%,100%{ opacity:1 } }
+@keyframes gwA{ 0%,6%{ opacity:1 } 8%,87%{ opacity:0 } 89%,100%{ opacity:1 } }
 @keyframes gwB{
-  0%,17%{ opacity:0 } 19%,23%{ opacity:1 } 25%,29%{ opacity:0 }
-  31%,35%{ opacity:1 } 37%,41%{ opacity:0 } 43%,47%{ opacity:1 } 49%,100%{ opacity:0 }
+  0%,6%{ opacity:0 } 8%,11%{ opacity:1 } 13%,15%{ opacity:0 }
+  17%,19%{ opacity:1 } 21%,100%{ opacity:0 }
 }
 @keyframes gwC{
-  0%,23%{ opacity:0 } 25%,29%{ opacity:1 } 31%,35%{ opacity:0 }
-  37%,41%{ opacity:1 } 43%,100%{ opacity:0 }
+  0%,11%{ opacity:0 } 13%,15%{ opacity:1 } 17%,19%{ opacity:0 }
+  21%,23%{ opacity:1 } 25%,100%{ opacity:0 }
 }
-@keyframes gwD{ 0%,47%{ opacity:0 } 49%,81%{ opacity:1 } 83%,100%{ opacity:0 } }
+@keyframes gwD{ 0%,23%{ opacity:0 } 25%,39%{ opacity:1 } 41%,100%{ opacity:0 } }
+@keyframes gwE{ 0%,39%{ opacity:0 } 41%,55%{ opacity:1 } 57%,100%{ opacity:0 } }
+@keyframes gwF{ 0%,55%{ opacity:0 } 57%,71%{ opacity:1 } 73%,100%{ opacity:0 } }
+@keyframes gwG{ 0%,71%{ opacity:0 } 73%,87%{ opacity:1 } 89%,100%{ opacity:0 } }
 
 /* the rail's dead space, occupied */
 .railfig{
-  flex:1 1 auto; min-height:120px; display:flex; flex-direction:column;
+  flex:1 1 auto; min-height:150px; display:flex; flex-direction:column;
   align-items:center; justify-content:flex-end; gap:7px;
   padding:10px 4px 12px; margin:6px 0; border-radius:var(--r);
   position:relative; overflow:hidden; text-align:center;
@@ -807,8 +815,8 @@ main{ flex:1 1 auto; min-width:0; padding-bottom:calc(var(--tab-h) + env(safe-ar
   background:linear-gradient(90deg,transparent,var(--acc),transparent); opacity:.45;
 }
 .railfig .rf-stage{ flex:1 1 auto; width:100%; min-height:130px; }
-/* the rail sizes its nav icons with , which is an id selector and
-   would otherwise shrink him to 19px — this has to out-specify it */
+/* the rail sizes its nav icons with `#rail svg`, an id selector that would
+   otherwise shrink him to 19px — this has to out-specify it */
 #rail .railfig .gf > svg{ height:100%; width:auto; max-width:100%; }
 .railfig .rf-cap{ display:flex; flex-direction:column; gap:1px; }
 .railfig .rf-cap b{ font-family:var(--f-disp); font-weight:700; font-size:12.5px; color:var(--ink); }
@@ -819,7 +827,7 @@ main{ flex:1 1 auto; min-width:0; padding-bottom:calc(var(--tab-h) + env(safe-ar
   position:relative; overflow:hidden; border-radius:var(--r-lg);
   border:1px solid var(--line); background:var(--bg-deep);
   padding:18px 16px 0; display:flex; flex-direction:column; align-items:center;
-  min-height:238px; isolation:isolate;
+  min-height:246px; isolation:isolate;
 }
 .stage::before{
   content:''; position:absolute; inset:-40% -10% auto -10%; height:150%;
@@ -832,18 +840,18 @@ main{ flex:1 1 auto; min-width:0; padding-bottom:calc(var(--tab-h) + env(safe-ar
 }
 .stage .st-mark{
   font-family:var(--f-disp); font-weight:800; font-size:11px; letter-spacing:.34em;
-  text-transform:uppercase; color:var(--acc-hi); margin-bottom:2px;
+  text-transform:uppercase; color:var(--acc-hi); margin-bottom:3px;
 }
 .stage .st-name{
-  font-family:var(--f-disp); font-weight:800; font-size:34px; line-height:1;
+  font-family:var(--f-disp); font-weight:800; font-size:31px; line-height:1.02;
   letter-spacing:-.035em; text-align:center;
 }
-.stage .st-sub{ font-size:12px; color:var(--ink-3); margin-top:5px; text-align:center; max-width:30ch; }
-.stage .st-fig{ position:relative; width:126px; height:150px; margin-top:6px; }
+.stage .st-sub{ font-size:12px; color:var(--ink-3); margin-top:6px; text-align:center; max-width:32ch; }
+.stage .st-fig{ width:132px; height:168px; margin-top:10px; }
 .stage .st-fig > .gf > svg{ height:100%; width:auto; }
-.stage .st-bar{ width:100%; max-width:290px; margin:-6px 0 -2px; }
+.stage .st-bar{ width:100%; max-width:290px; margin:-4px 0 -2px; }
 
-/* the barbell on the stage: it dips under the load and comes back up */
+/* the barbell on the stage dips under the load and drives back up */
 .bbell{ display:block; width:100%; height:auto; }
 .bbell .bb-lift{ animation:bblift 4.6s ease-in-out infinite; transform-origin:50% 50%; }
 @keyframes bblift{
@@ -851,7 +859,6 @@ main{ flex:1 1 auto; min-width:0; padding-bottom:calc(var(--tab-h) + env(safe-ar
   38%{ transform:translateY(5px) }
   62%{ transform:translateY(-3px) }
 }
-.stage .st-plates{ display:flex; gap:4px; justify-content:center; margin:8px 0 2px; }
 </style>
 
 
@@ -6316,6 +6323,8 @@ function boot(){
 
 
 
+
+
 <script>
 /* ============================================================
    PHYSIQUE
@@ -6332,19 +6341,24 @@ const devFlat = v => DEV_KEYS.reduce((a,k) => (a[k] = v, a), {});
 
 const SKINS    = ['#f4d0aa','#e8b48c','#d99b6c','#c98a5e','#b87850','#a9663d','#8d5228','#61401f'];
 const HAIRCOLS = ['#141414','#2b2118','#3b2f2a','#6b4423','#8a5a2b','#c19a5b','#9aa8b4','#ececec','#7a2f1f','#2f5c8a'];
-const HAIRS    = ['buzz','short','flattop','curly','afro','long','ponytail','mullet','dreads','bald'];
-const HAIR_N   = { buzz:'Buzz', short:'Short', flattop:'Flat top', curly:'Curls', afro:'Afro',
-                   long:'Long', ponytail:'Ponytail', mullet:'Mullet', dreads:'Dreads', bald:'Bald' };
+const HAIRS    = ['buzz','crew','short','slick','flattop','curly','afro','cornrows',
+                  'long','ponytail','topknot','mullet','dreads','bald'];
+const HAIR_N   = { buzz:'Buzz', crew:'Crew cut', short:'Short', slick:'Slicked back',
+                   flattop:'Flat top', curly:'Curls', afro:'Afro', cornrows:'Cornrows',
+                   long:'Long', ponytail:'Ponytail', topknot:'Top knot', mullet:'Mullet',
+                   dreads:'Dreads', bald:'Bald' };
 const BEARDS   = ['none','stubble','stache','goatee','full'];
 const BEARD_N  = { none:'Clean', stubble:'Stubble', stache:'Moustache', goatee:'Goatee', full:'Full beard' };
 const ACCS     = ['none','shades','headband','cap','belt','wraps','chain'];
 const ACC_N    = { none:'None', shades:'Shades', headband:'Headband', cap:'Cap',
                    belt:'Lifting belt', wraps:'Wrist wraps', chain:'Chain' };
 const TRUNKS   = ['#c8102e','#0057b8','#ffd100','#009639','#8b1f8b','#d95926','#1baf7a','#15191e','#e8e8e8','#4a3aa7'];
-const POSES    = ['relaxed','flex','lat','cross'];
+const POSES    = ['relaxed','flex','abs','back','most','lat','cross'];
 const TATTOOS  = ['none','sleeve','chest','both','full'];
 const TATTOO_N = { none:'None', sleeve:'Arm sleeve', chest:'Chest piece', both:'Sleeve + chest', full:'Fully inked' };
-const POSE_N   = { relaxed:'Stood relaxed', flex:'Double biceps', lat:'Lat spread', cross:'Arms crossed' };
+const POSE_N   = { relaxed:'Stood relaxed', flex:'Front double bi', abs:'Abs and thighs',
+                   back:'Rear double bi', most:'Most muscular', lat:'Lat spread',
+                   cross:'Arms crossed' };
 
 const r1   = v => Math.round(v * 10) / 10;
 const cl01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
@@ -6356,15 +6370,23 @@ function mix(a, b, t){
 
 /* ------------------------------------------------------------
    mmFigure(look, dev, opt) -> svg string
+
+   Built on a canonical 7.75-head figure rather than by eye. Every
+   landmark below is a fraction of standing height, and every width
+   is expressed against head height, which is what stops the thing
+   drifting back into caricature: the earlier passes had a 2.7:1
+   shoulder-to-waist and thighs wider than the hips.
+
+     crown 0 · chin .125 · shoulder .195 · nipple .245
+     navel .375 · crotch .50 · knee .72 · ankle .955 · sole 1
+
    look: { skin hair hairCol beard brow acc trunks pose tattoo }
    dev:  { delts chest back traps arms abs legs calves }  0..1
    opt:  { h:pixel height, crop:'full'|'bust' }
-   Canvas 170 x 330, centre x = 85. Light comes from the upper
-   left, which is why every fill runs through one gradient rather
-   than being a flat colour — flat skin is what made the first
-   version read as a pictogram.
 ------------------------------------------------------------ */
+const REAR_POSES = { back:1, backlat:1 };
 let _mmSeq = 0;
+
 function mmFigure(look, dev, opt){
   const o  = opt || {};
   const L  = Object.assign({ skin:SKINS[2], hair:'buzz', hairCol:'#2b2118', beard:'none',
@@ -6373,51 +6395,55 @@ function mmFigure(look, dev, opt){
   const d  = Object.assign(devFlat(0.4), dev || {});
   const id = 'mm' + (++_mmSeq);
   const cx = 85, hc = L.hairCol, sk = L.skin;
-  const lite  = mix(sk, '#fff3e4', .26);
-  const mid   = mix(sk, '#3a1f10', .13);
-  const shade = mix(sk, '#3a1f10', .30);
-  const deep  = mix(sk, '#22120a', .50);
-  const ink   = '#20293a';
-  const SKF   = 'url(#' + id + 's)';          /* the lit skin gradient */
+  const lite  = mix(sk, '#fff3e4', .24);
+  const mid   = mix(sk, '#3a1f10', .12);
+  const shade = mix(sk, '#3a1f10', .28);
+  const deep  = mix(sk, '#22120a', .48);
+  const ink   = '#131b26';
+  const SKF   = 'url(#' + id + 's)';
+  const rear  = !!REAR_POSES[L.pose];
 
-  /* Development becomes shape, right here. These are tuned against a real
-     hip-to-thigh ratio: an earlier pass had the thighs twice the width of
-     the hips, which is what made the lower body read as a skirt. */
-  const SD = 27 + 13*d.delts + 6*d.back;      // shoulder half-span
-  const DR = 7.5 + 4.6*d.delts;               // deltoid cap radius
-  const PW = 13 + 7*d.chest;                  // pec half-width
-  const PH = 10.5 + 5.5*d.chest;              // pec height
-  const LF = 3 + 9.5*d.back;                  // lat flare
-  const TR = 2 + 9*d.traps;                   // trap rise
-  const NW = 6.6 + 4*d.traps;                 // neck half-width
-  const WW = 15 + 2.5*d.abs + 1.5*d.legs;     // waist half-width
-  const AU = 5.8 + 4.4*d.arms;                // upper-arm radius
-  const AF = 4.6 + 2.8*d.arms;                // forearm radius
-  const TH = 8 + 4.6*d.legs;                  // thigh radius
-  const CA = 5.2 + 3.4*d.calves;              // calf radius
+  /* ---- landmarks ---- */
+  const yCrown = 14, yChin = 48, ySh = 68, yNip = 82,
+        yNav = 118, yCro = 150, yKnee = 213, yAnk = 272, ySole = 284;
+  const headRx = 13, headRy = 17, headCy = 31;
+
+  /* ---- mass, then widths measured against it ---- */
+  const MASS = (d.chest + d.back + d.delts + d.arms + d.legs) / 5;
+  const SD = 24 + 9*d.delts + 5*d.back;            // shoulder half-span  24..38
+  const DR = 8 + 5*d.delts;                        // deltoid cap
+  const PW = 12 + 6*d.chest;                       // pec half-width
+  const PH = 10 + 5*d.chest;
+  const LF = 3 + 9*d.back;                         // lat flare
+  const TR = 2 + 9*d.traps;
+  const NW = 6.5 + 3.5*d.traps;                    // neck half-width
+  /* composition: mass widens the waist, conditioning narrows it */
+  const WW = Math.max(12.5, 14.5 + 8*MASS - 3.2*d.abs);
+  const HW = WW + 4;                               // hips
+  const AU = 6.5 + 6*d.arms;                       // upper arm
+  const AF = 5 + 4.5*d.arms;                       // forearm
+  const TH = 8.5 + 4.5*d.legs;                     // thigh
+  const CA = 6 + 3.6*d.calves;                     // calf
+  const hipX = r1(HW*0.52);
   const cut = cl01(d.abs * 1.05);
-
-  const ySh = 76, yPec = 82, yWaist = 138, yHip = 156, yKnee = 218, yAnk = 272;
-  const hipX = r1(WW*0.62), yThigh = yHip + 4;
-  const tTop = yHip - 20, tBot = yHip + 24;
 
   let s =
     '<defs>' +
-      '<linearGradient id="'+id+'s" gradientUnits="userSpaceOnUse" x1="24" y1="40" x2="150" y2="150">' +
+      '<linearGradient id="'+id+'s" gradientUnits="userSpaceOnUse" x1="26" y1="40" x2="146" y2="150">' +
         '<stop offset="0" stop-color="'+lite+'"/><stop offset=".36" stop-color="'+sk+'"/>' +
         '<stop offset=".78" stop-color="'+mid+'"/><stop offset="1" stop-color="'+shade+'"/>' +
       '</linearGradient>' +
-      '<linearGradient id="'+id+'t" gradientUnits="userSpaceOnUse" x1="40" y1="0" x2="140" y2="0">' +
-        '<stop offset="0" stop-color="'+mix(L.trunks,'#ffffff',.20)+'"/>' +
+      '<linearGradient id="'+id+'t" gradientUnits="userSpaceOnUse" x1="50" y1="0" x2="130" y2="0">' +
+        '<stop offset="0" stop-color="'+mix(L.trunks,'#ffffff',.22)+'"/>' +
         '<stop offset=".55" stop-color="'+L.trunks+'"/>' +
-        '<stop offset="1" stop-color="'+mix(L.trunks,'#000000',.34)+'"/>' +
+        '<stop offset="1" stop-color="'+mix(L.trunks,'#000000',.36)+'"/>' +
       '</linearGradient>' +
     '</defs>';
 
-  /* ---------- a hand that is actually a hand ---------- */
+  /* ---------- hands ---------- */
   const hand = (hx, hy, ex, ey, g, open) => {
     const ang = r1(Math.atan2(hy - ey, hx - ex) * 180 / Math.PI);
-    const w = AF*0.92, l = AF*(open ? 2.2 : 1.55);
+    const w = AF*0.9, l = AF*(open ? 2.2 : 1.5);
     let p = '';
     if (open){
       for (let i = 0; i < 4; i++){
@@ -6428,305 +6454,386 @@ function mmFigure(look, dev, opt){
       p += '<path d="M'+r1(l*0.12)+' '+r1(w*0.55)+'L'+r1(l*0.52)+' '+r1(w*1.4)+'" stroke="'+SKF+
            '" stroke-width="'+r1(w*0.5)+'" stroke-linecap="round" fill="none"/>' +
            '<ellipse cx="'+r1(l*0.2)+'" cy="0" rx="'+r1(l*0.44)+'" ry="'+r1(w*0.96)+'" fill="'+SKF+'"/>' +
-           '<path d="M'+r1(l*0.5)+' '+r1(-w*0.72)+'v'+r1(w*1.44)+'" stroke="'+shade+
-           '" stroke-width=".7" opacity=".4"/>';
+           '<path d="M'+r1(l*0.5)+' '+r1(-w*0.72)+'v'+r1(w*1.44)+'" stroke="'+shade+'" stroke-width=".7" opacity=".4"/>';
     } else {
       p += '<ellipse cx="'+r1(l*0.26)+'" cy="0" rx="'+r1(l*0.56)+'" ry="'+r1(w)+'" fill="'+SKF+'"/>';
       for (let i = 0; i < 3; i++)
         p += '<circle cx="'+r1(l*0.66)+'" cy="'+r1((i-1)*w*0.6)+'" r="'+r1(w*0.31)+'" fill="'+SKF+'"/>';
-      p += '<path d="M'+r1(l*0.52)+' '+r1(-w*0.55)+'v'+r1(w*1.1)+'" stroke="'+shade+
-           '" stroke-width=".8" opacity=".45"/>' +
+      p += '<path d="M'+r1(l*0.52)+' '+r1(-w*0.55)+'v'+r1(w*1.1)+'" stroke="'+shade+'" stroke-width=".8" opacity=".45"/>' +
            '<path d="M'+r1(l*0.08)+' '+r1(w*0.45)+'L'+r1(l*0.52)+' '+r1(w*0.92)+'" stroke="'+SKF+
            '" stroke-width="'+r1(w*0.46)+'" stroke-linecap="round" fill="none"/>';
     }
-    /* scale(1,g) keeps the thumb on the inside of whichever arm this is */
     return '<g transform="translate('+hx+' '+hy+') rotate('+ang+') scale(1 '+g+')">' + p + '</g>';
   };
 
-  /* ---------- and a foot with an arch and toes ---------- */
-  const foot = (fx, fy, g) => {
-    const w = CA*0.92, len = CA*2.1;
-    let out = '<path d="M'+r1(fx - g*w*0.72)+' '+r1(fy-18)+
-      'L'+r1(fx + g*w*0.62)+' '+r1(fy-18)+
-      'L'+r1(fx + g*len)+' '+r1(fy-5.5)+
+  /* ---------- feet ---------- */
+  const foot = (fx, g, toeOut) => {
+    const w = CA*0.9, len = CA*(toeOut ? 2.6 : 2.0), fy = ySole;
+    let out = '<path d="M'+r1(fx - g*w*0.72)+' '+r1(fy-15)+
+      'L'+r1(fx + g*w*0.62)+' '+r1(fy-15)+
+      'L'+r1(fx + g*len)+' '+r1(fy-5)+
       'Q'+r1(fx + g*(len+1.6))+' '+fy+' '+r1(fx + g*(len-2.2))+' '+fy+
       'L'+r1(fx - g*w*1.05)+' '+fy+
-      'Q'+r1(fx - g*w*1.55)+' '+r1(fy-7)+' '+r1(fx - g*w*0.72)+' '+r1(fy-18)+'Z" fill="'+SKF+'"/>';
+      'Q'+r1(fx - g*w*1.55)+' '+r1(fy-6.5)+' '+r1(fx - g*w*0.72)+' '+r1(fy-15)+'Z" fill="'+SKF+'"/>';
     for (let i = 0; i < 4; i++)
-      out += '<circle cx="'+r1(fx + g*(len - 2.4 - i*w*0.42))+'" cy="'+r1(fy-2.3)+
-             '" r="'+r1(w*0.19)+'" fill="'+shade+'" opacity=".5"/>';
-    out += '<path d="M'+r1(fx - g*w*0.85)+' '+r1(fy-2)+'Q'+r1(fx + g*w*0.5)+' '+r1(fy-7)+' '+
-           r1(fx + g*(len-3))+' '+r1(fy-2.5)+'" stroke="'+shade+'" stroke-width="1" fill="none" opacity=".45"/>' +
-           '<circle cx="'+r1(fx - g*w*0.35)+'" cy="'+r1(fy-13)+'" r="'+r1(w*0.26)+'" fill="'+lite+'" opacity=".5"/>';
+      out += '<circle cx="'+r1(fx + g*(len - 2.2 - i*w*0.42))+'" cy="'+r1(fy-2.1)+
+             '" r="'+r1(w*0.18)+'" fill="'+shade+'" opacity=".5"/>';
+    out += '<path d="M'+r1(fx - g*w*0.85)+' '+r1(fy-1.8)+'Q'+r1(fx + g*w*0.5)+' '+r1(fy-6.5)+' '+
+           r1(fx + g*(len-3))+' '+r1(fy-2.4)+'" stroke="'+shade+'" stroke-width="1" fill="none" opacity=".45"/>' +
+           '<circle cx="'+r1(fx - g*w*0.3)+'" cy="'+r1(fy-11)+'" r="'+r1(w*0.25)+'" fill="'+lite+'" opacity=".5"/>';
     return out;
   };
 
-  /* ---------- ground shadow: it puts him on a floor ---------- */
-  s += '<ellipse cx="'+cx+'" cy="'+(yAnk+2)+'" rx="'+r1(hipX + TH + 10)+'" ry="5.5" fill="#000" opacity=".26"/>';
+  /* ground */
+  s += '<ellipse cx="'+cx+'" cy="'+(ySole+2)+'" rx="'+r1(hipX + TH + 9)+'" ry="5" fill="#000" opacity=".26"/>';
 
-  /* hair behind the head */
-  if (L.hair === 'afro')     s += '<circle cx="'+cx+'" cy="30" r="23" fill="'+hc+'"/>';
-  if (L.hair === 'long')     s += '<path d="M'+(cx-18)+' 34q0-20 18-20t18 20v34q-6 5-11-3V36h-14v29q-5 8-11 3z" fill="'+hc+'"/>';
-  if (L.hair === 'dreads')   s += '<path d="M'+(cx-18)+' 32q0-19 18-19t18 19v26q-5 4-9-2V34h-18v22q-4 6-9 2z" fill="'+hc+'"/>' +
-                                  [-14,-7,0,7,14].map((dx,i) => '<rect x="'+(cx+dx-2)+'" y="44" width="4" height="'+(16+i*3)+'" rx="2" fill="'+hc+'"/>').join('');
-  if (L.hair === 'ponytail') s += '<circle cx="'+(cx+17)+'" cy="38" r="7.5" fill="'+hc+'"/>';
-  if (L.hair === 'mullet')   s += '<path d="M'+(cx-17)+' 34q0-19 17-19t17 19v24q-5 4-9-2V36h-16v20q-4 6-9 2z" fill="'+hc+'"/>';
+  /* ---------- hair behind the head ---------- */
+  const hairBack = () => {
+    if (L.hair === 'afro')     return '<circle cx="'+cx+'" cy="'+(headCy-4)+'" r="21.5" fill="'+hc+'"/>';
+    if (L.hair === 'long')     return '<path d="M'+(cx-16)+' '+(headCy+2)+'q0-19 16-19t16 19v32q-5.5 5-10-3V'+(headCy+4)+'h-12v27q-4.5 8-10 3z" fill="'+hc+'"/>';
+    if (L.hair === 'dreads')   return '<path d="M'+(cx-16)+' '+headCy+'q0-18 16-18t16 18v24q-4.5 4-8-2V'+(headCy+2)+'h-16v20q-3.5 6-8 2z" fill="'+hc+'"/>' +
+                                      [-12,-6,0,6,12].map((dx,i) => '<rect x="'+(cx+dx-1.8)+'" y="'+(headCy+12)+'" width="3.6" height="'+(15+i*3)+'" rx="1.8" fill="'+hc+'"/>').join('');
+    if (L.hair === 'ponytail') return '<circle cx="'+(cx+15)+'" cy="'+(headCy+7)+'" r="6.8" fill="'+hc+'"/>' +
+                                      '<path d="M'+(cx+15)+' '+(headCy+12)+'q4 10 1 20" stroke="'+hc+'" stroke-width="5" fill="none" stroke-linecap="round"/>';
+    if (L.hair === 'topknot')  return '<circle cx="'+cx+'" cy="'+(yCrown-3)+'" r="6" fill="'+hc+'"/>';
+    if (L.hair === 'mullet')   return '<path d="M'+(cx-15)+' '+headCy+'q0-18 15-18t15 18v22q-4.5 4-8-2V'+(headCy+3)+'h-14v18q-3.5 6-8 2z" fill="'+hc+'"/>';
+    return '';
+  };
+  if (!rear) s += hairBack();
 
-  /* neck with its two cords, then traps rising into the shoulder */
-  s += '<path d="M'+r1(cx-NW)+' 44h'+r1(NW*2)+'v20h'+r1(-NW*2)+'z" fill="'+deep+'"/>' +
-       '<path d="M'+r1(cx-NW*0.5)+' 46l2 16M'+r1(cx+NW*0.5)+' 46l-2 16" stroke="'+shade+
-         '" stroke-width="1.4" stroke-linecap="round" opacity=".5"/>';
-  s += '<path d="M'+r1(cx-NW-1)+' '+r1(54-TR*0.30)+
-       'C'+r1(cx-NW-6)+' '+r1(58+TR*0.2)+','+r1(cx-SD*0.60)+' '+(ySh-9)+','+r1(cx-SD*0.80)+' '+(ySh+1)+
+  /* ---------- neck + traps ---------- */
+  s += '<path d="M'+r1(cx-NW)+' '+(yChin-6)+'h'+r1(NW*2)+'v'+(ySh-yChin+10)+'h'+r1(-NW*2)+'z" fill="'+deep+'"/>';
+  if (!rear)
+    s += '<path d="M'+r1(cx-NW*0.5)+' '+(yChin-3)+'l1.8 14M'+r1(cx+NW*0.5)+' '+(yChin-3)+'l-1.8 14" ' +
+         'stroke="'+shade+'" stroke-width="1.3" stroke-linecap="round" opacity=".5"/>';
+  s += '<path d="M'+r1(cx-NW-1)+' '+r1(yChin-2-TR*0.28)+
+       'C'+r1(cx-NW-5)+' '+r1(yChin+4+TR*0.2)+','+r1(cx-SD*0.58)+' '+(ySh-8)+','+r1(cx-SD*0.80)+' '+(ySh+1)+
        'L'+r1(cx+SD*0.80)+' '+(ySh+1)+
-       'C'+r1(cx+SD*0.60)+' '+(ySh-9)+','+r1(cx+NW+6)+' '+r1(58+TR*0.2)+','+r1(cx+NW+1)+' '+r1(54-TR*0.30)+
-       'Z" fill="'+SKF+'"/>' +
-       '<path d="M'+r1(cx-NW-2)+' '+r1(58-TR*0.2)+'Q'+r1(cx-SD*0.45)+' '+(ySh-8)+' '+r1(cx-SD*0.74)+' '+(ySh+2)+
-       'M'+r1(cx+NW+2)+' '+r1(58-TR*0.2)+'Q'+r1(cx+SD*0.45)+' '+(ySh-8)+' '+r1(cx+SD*0.74)+' '+(ySh+2)+
-       '" stroke="'+shade+'" stroke-width="'+r1(1+1.6*d.traps)+'" fill="none" opacity=".55"/>';
+       'C'+r1(cx+SD*0.58)+' '+(ySh-8)+','+r1(cx+NW+5)+' '+r1(yChin+4+TR*0.2)+','+r1(cx+NW+1)+' '+r1(yChin-2-TR*0.28)+
+       'Z" fill="'+SKF+'"/>';
 
-  /* torso */
-  s += '<path d="M'+r1(cx-SD*0.74)+' '+ySh+
-       'C'+r1(cx-SD*0.96)+' '+(ySh+16)+','+r1(cx-WW-LF)+' '+(yWaist-30)+','+r1(cx-WW)+' '+yWaist+
-       'C'+r1(cx-WW-1)+' '+(yWaist+8)+','+r1(cx-WW-2)+' '+(yHip-4)+','+r1(cx-WW-1)+' '+yHip+
-       'L'+r1(cx+WW+1)+' '+yHip+
-       'C'+r1(cx+WW+2)+' '+(yHip-4)+','+r1(cx+WW+1)+' '+(yWaist+8)+','+r1(cx+WW)+' '+yWaist+
-       'C'+r1(cx+WW+LF)+' '+(yWaist-30)+','+r1(cx+SD*0.96)+' '+(ySh+16)+','+r1(cx+SD*0.74)+' '+ySh+'Z" fill="'+SKF+'"/>';
+  /* ---------- torso ---------- */
+  s += '<path d="M'+r1(cx-SD*0.76)+' '+ySh+
+       'C'+r1(cx-SD*0.95)+' '+(ySh+14)+','+r1(cx-WW-LF)+' '+(yNav-16)+','+r1(cx-WW)+' '+yNav+
+       'C'+r1(cx-WW-1)+' '+(yNav+10)+','+r1(cx-HW)+' '+(yCro-16)+','+r1(cx-HW)+' '+yCro+
+       'L'+r1(cx+HW)+' '+yCro+
+       'C'+r1(cx+HW)+' '+(yCro-16)+','+r1(cx+WW+1)+' '+(yNav+10)+','+r1(cx+WW)+' '+yNav+
+       'C'+r1(cx+WW+LF)+' '+(yNav-16)+','+r1(cx+SD*0.95)+' '+(ySh+14)+','+r1(cx+SD*0.76)+' '+ySh+'Z" fill="'+SKF+'"/>';
 
-  /* lat shadow down the flare */
-  if (d.back > 0.18){
-    const latOp = r1(.30 + .40*d.back);
+  if (rear){
+    /* ----- the back: traps, lats, erectors ----- */
+    const tOp = r1(.35 + .45*d.traps);
+    s += '<path d="M'+r1(cx-NW-2)+' '+(yChin+2)+'C'+r1(cx-SD*0.5)+' '+(ySh+2)+','+r1(cx-SD*0.62)+' '+(ySh+16)+','+r1(cx-WW*0.5)+' '+(yNip+14)+
+         'L'+r1(cx+WW*0.5)+' '+(yNip+14)+'C'+r1(cx+SD*0.62)+' '+(ySh+16)+','+r1(cx+SD*0.5)+' '+(ySh+2)+','+r1(cx+NW+2)+' '+(yChin+2)+
+         'Z" fill="'+shade+'" opacity="'+tOp+'"/>';
     [-1,1].forEach(g => {
-      s += '<path d="M'+r1(cx+g*SD*0.80)+' '+(ySh+8)+
-           'C'+r1(cx+g*SD*0.92)+' '+(ySh+26)+','+r1(cx+g*(WW+LF*0.85))+' '+(yWaist-30)+','+r1(cx+g*(WW+1))+' '+(yWaist-4)+
-           'l'+(-g*6)+' -3C'+r1(cx+g*(WW+LF*0.5))+' '+(yWaist-30)+','+r1(cx+g*SD*0.72)+' '+(ySh+26)+','+r1(cx+g*SD*0.66)+' '+(ySh+10)+
-           'Z" fill="'+shade+'" opacity="'+latOp+'"/>';
+      s += '<path d="M'+r1(cx+g*SD*0.78)+' '+(ySh+6)+
+           'C'+r1(cx+g*(SD*0.9))+' '+(ySh+22)+','+r1(cx+g*(WW+LF*0.8))+' '+(yNav-18)+','+r1(cx+g*(WW-1))+' '+(yNav+2)+
+           'L'+r1(cx+g*2)+' '+(yNip+16)+'Z" fill="'+lite+'" opacity="'+r1(.30+.42*d.back)+'"/>';
     });
-  }
-
-  /* pecs */
-  const pecY = yPec + PH*0.5;
-  [-1,1].forEach(g => {
-    s += '<path d="M'+r1(cx+g*1.5)+' '+r1(yPec-2)+
-         'C'+r1(cx+g*PW*0.5)+' '+r1(yPec-5)+','+r1(cx+g*PW)+' '+r1(yPec-2)+','+r1(cx+g*PW)+' '+r1(pecY+2)+
-         'C'+r1(cx+g*PW)+' '+r1(pecY+PH*0.85)+','+r1(cx+g*PW*0.35)+' '+r1(pecY+PH)+','+r1(cx+g*1.5)+' '+r1(pecY+PH*0.72)+
-         'Z" fill="'+lite+'" opacity="'+(g < 0 ? '.9' : '.62')+'"/>';
-  });
-  s += '<path d="M'+cx+' '+r1(yPec-1)+'v'+r1(PH*1.6)+'" stroke="'+deep+'" stroke-width="'+r1(1.2+1.4*d.chest)+'" stroke-linecap="round" opacity=".7"/>' +
-       '<path d="M'+r1(cx-PW+1)+' '+r1(pecY+PH*0.74)+'Q'+cx+' '+r1(pecY+PH*1.12)+' '+r1(cx+PW-1)+' '+r1(pecY+PH*0.74)+
-       '" stroke="'+shade+'" stroke-width="'+r1(1.4+1.6*d.chest)+'" fill="none" stroke-linecap="round"/>' +
-       /* collarbones */
-       '<path d="M'+r1(cx-NW-1)+' '+(yPec-6)+'Q'+r1(cx-PW*0.6)+' '+(yPec-2)+' '+r1(cx-PW)+' '+(yPec-4)+
-       'M'+r1(cx+NW+1)+' '+(yPec-6)+'Q'+r1(cx+PW*0.6)+' '+(yPec-2)+' '+r1(cx+PW)+' '+(yPec-4)+
-       '" stroke="'+shade+'" stroke-width="1.2" fill="none" opacity=".55"/>';
-
-  /* chest ink: two wings under the collarbones rather than a filled panel.
-     Filling the pecs read as a grey bib, not as a tattoo. */
-  if (L.tattoo === 'chest' || L.tattoo === 'both' || L.tattoo === 'full'){
-    const iy = r1(yPec + 4), ink2 = '#131b26';
-    let t = '';
+    s += '<path d="M'+r1(cx-3)+' '+(yNip+8)+'V'+(yCro-6)+'M'+r1(cx+3)+' '+(yNip+8)+'V'+(yCro-6)+
+         '" stroke="'+shade+'" stroke-width="'+r1(2+2.4*d.traps)+'" stroke-linecap="round" opacity=".6"/>' +
+         '<path d="M'+cx+' '+(yNip+6)+'V'+(yCro-4)+'" stroke="'+deep+'" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>' +
+         /* the two dimples above the glutes */
+         '<circle cx="'+r1(cx-7)+'" cy="'+(yCro-6)+'" r="2" fill="'+shade+'" opacity=".55"/>' +
+         '<circle cx="'+r1(cx+7)+'" cy="'+(yCro-6)+'" r="2" fill="'+shade+'" opacity=".55"/>';
+  } else {
+    /* ----- the front: pecs, ribs, abs ----- */
+    const pecY = yNip + PH*0.5;
     [-1,1].forEach(g => {
-      t += '<path d="M'+r1(cx + g*2)+' '+iy+
-           'Q'+r1(cx + g*PW*0.55)+' '+r1(iy-4)+' '+r1(cx + g*PW*0.92)+' '+r1(iy+3)+
-           'Q'+r1(cx + g*PW*0.55)+' '+r1(iy+4)+' '+r1(cx + g*2)+' '+r1(iy+7)+
-           'Z" fill="'+ink2+'" opacity=".72"/>' +
-           '<path d="M'+r1(cx + g*PW*0.30)+' '+r1(iy+9)+'L'+r1(cx + g*PW*0.80)+' '+r1(iy+12)+
-           '" stroke="'+ink2+'" stroke-width="2" stroke-linecap="round" opacity=".6"/>' +
-           '<path d="M'+r1(cx + g*PW*0.34)+' '+r1(iy+14)+'L'+r1(cx + g*PW*0.66)+' '+r1(iy+16)+
-           '" stroke="'+ink2+'" stroke-width="1.6" stroke-linecap="round" opacity=".5"/>';
+      s += '<path d="M'+r1(cx+g*1.5)+' '+r1(yNip-3)+
+           'C'+r1(cx+g*PW*0.5)+' '+r1(yNip-6)+','+r1(cx+g*PW)+' '+r1(yNip-3)+','+r1(cx+g*PW)+' '+r1(pecY+1)+
+           'C'+r1(cx+g*PW)+' '+r1(pecY+PH*0.85)+','+r1(cx+g*PW*0.35)+' '+r1(pecY+PH)+','+r1(cx+g*1.5)+' '+r1(pecY+PH*0.7)+
+           'Z" fill="'+lite+'" opacity="'+(g < 0 ? '.88' : '.6')+'"/>';
     });
-    s += t;
-  }
+    s += '<path d="M'+cx+' '+r1(yNip-2)+'v'+r1(PH*1.55)+'" stroke="'+deep+'" stroke-width="'+r1(1.1+1.3*d.chest)+'" stroke-linecap="round" opacity=".7"/>' +
+         '<path d="M'+r1(cx-PW+1)+' '+r1(pecY+PH*0.72)+'Q'+cx+' '+r1(pecY+PH*1.1)+' '+r1(cx+PW-1)+' '+r1(pecY+PH*0.72)+
+         '" stroke="'+shade+'" stroke-width="'+r1(1.3+1.5*d.chest)+'" fill="none" stroke-linecap="round"/>' +
+         '<path d="M'+r1(cx-NW-1)+' '+(yNip-7)+'Q'+r1(cx-PW*0.6)+' '+(yNip-3)+' '+r1(cx-PW)+' '+(yNip-5)+
+         'M'+r1(cx+NW+1)+' '+(yNip-7)+'Q'+r1(cx+PW*0.6)+' '+(yNip-3)+' '+r1(cx+PW)+' '+(yNip-5)+
+         '" stroke="'+shade+'" stroke-width="1.1" fill="none" opacity=".5"/>';
 
-  /* abs */
-  if (cut > 0.14){
-    const aTop = r1(pecY + PH*1.25), rows = cut > 0.62 ? 4 : 3;
-    const aw = r1(WW*0.44), gap = r1((yWaist - aTop - 6) / rows);
-    let abs = '';
-    for (let i = 0; i < rows; i++){
-      const y = r1(aTop + i*gap), h = r1(gap*0.66), w = r1(aw*(1 - i*0.07));
-      abs += '<rect x="'+r1(cx-w-1)+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+r1(h*0.38)+'" fill="'+lite+'"/>' +
-             '<rect x="'+r1(cx+1)+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+r1(h*0.38)+'" fill="'+lite+'"/>';
+    if (L.tattoo === 'chest' || L.tattoo === 'both' || L.tattoo === 'full'){
+      const iy = r1(yNip + 3);
+      [-1,1].forEach(g => {
+        s += '<path d="M'+r1(cx + g*2)+' '+iy+
+             'Q'+r1(cx + g*PW*0.55)+' '+r1(iy-4)+' '+r1(cx + g*PW*0.92)+' '+r1(iy+3)+
+             'Q'+r1(cx + g*PW*0.55)+' '+r1(iy+4)+' '+r1(cx + g*2)+' '+r1(iy+7)+'Z" fill="'+ink+'" opacity=".72"/>' +
+             '<path d="M'+r1(cx + g*PW*0.30)+' '+r1(iy+9)+'L'+r1(cx + g*PW*0.78)+' '+r1(iy+12)+
+             '" stroke="'+ink+'" stroke-width="1.9" stroke-linecap="round" opacity=".6"/>';
+      });
     }
-    abs += '<path d="M'+cx+' '+aTop+'V'+r1(yWaist-3)+'" stroke="'+shade+'" stroke-width="1.3" stroke-linecap="round"/>' +
-           '<path d="M'+r1(cx-WW+1)+' '+r1(aTop+2)+'l5 5M'+r1(cx-WW+2)+' '+r1(aTop+11)+'l5 4" stroke="'+shade+'" stroke-width="1.5" stroke-linecap="round"/>' +
-           '<path d="M'+r1(cx+WW-1)+' '+r1(aTop+2)+'l-5 5M'+r1(cx+WW-2)+' '+r1(aTop+11)+'l-5 4" stroke="'+shade+'" stroke-width="1.5" stroke-linecap="round"/>';
-    s += '<g opacity="'+r1(0.25 + 0.75*cut)+'">' + abs + '</g>';
+    if (cut > 0.14){
+      const aTop = r1(yNip + PH*1.6), rows = cut > 0.62 ? 4 : 3;
+      const aw = r1(WW*0.42), gap = r1((yNav + 6 - aTop) / rows);
+      let abs = '';
+      for (let i = 0; i < rows; i++){
+        const y = r1(aTop + i*gap), hh = r1(gap*0.66), w = r1(aw*(1 - i*0.07));
+        abs += '<rect x="'+r1(cx-w-1)+'" y="'+y+'" width="'+w+'" height="'+hh+'" rx="'+r1(hh*0.38)+'" fill="'+lite+'"/>' +
+               '<rect x="'+r1(cx+1)+'" y="'+y+'" width="'+w+'" height="'+hh+'" rx="'+r1(hh*0.38)+'" fill="'+lite+'"/>';
+      }
+      abs += '<path d="M'+cx+' '+aTop+'V'+r1(yNav+4)+'" stroke="'+shade+'" stroke-width="1.2" stroke-linecap="round"/>' +
+             '<path d="M'+r1(cx-WW+1)+' '+r1(aTop+2)+'l4.5 4.5M'+r1(cx-WW+2)+' '+r1(aTop+10)+'l4.5 3.6" stroke="'+shade+'" stroke-width="1.4" stroke-linecap="round"/>' +
+             '<path d="M'+r1(cx+WW-1)+' '+r1(aTop+2)+'l-4.5 4.5M'+r1(cx+WW-2)+' '+r1(aTop+10)+'l-4.5 3.6" stroke="'+shade+'" stroke-width="1.4" stroke-linecap="round"/>';
+      s += '<g opacity="'+r1(0.25 + 0.75*cut)+'">' + abs + '</g>';
+    }
   }
 
   /* ---------- legs ---------- */
+  const wide = L.pose === 'most' || L.pose === 'back' ? 1.22 : L.pose === 'abs' ? 0.92 : 1;
   [-1,1].forEach(g => {
-    const x0 = r1(cx + g*hipX), x1 = r1(cx + g*(hipX+2)), x2 = r1(cx + g*(hipX+0.5));
-    s += '<path d="M'+x0+' '+yThigh+'L'+x1+' '+yKnee+'" stroke="'+SKF+'" stroke-width="'+r1(TH*2)+'" stroke-linecap="round" fill="none"/>' +
-         '<path d="M'+x1+' '+(yKnee-4)+'L'+x2+' '+(yAnk-14)+'" stroke="'+SKF+'" stroke-width="'+r1(CA*2)+'" stroke-linecap="round" fill="none"/>' +
-         /* inner (adductor) line, beside the centre split */
-         '<path d="M'+r1(x0 - g*TH*0.34)+' '+(yThigh+12)+'Q'+r1(x0 - g*TH*0.50)+' '+r1((yThigh+yKnee)/2)+' '+r1(x1 - g*TH*0.26)+' '+(yKnee-18)+
-         '" stroke="'+shade+'" stroke-width="'+r1(1.6+2.2*d.legs)+'" fill="none" stroke-linecap="round" opacity=".85"/>' +
-         /* outer quad sweep */
-         '<path d="M'+r1(x0 + g*TH*0.46)+' '+(yThigh+16)+'Q'+r1(x0 + g*TH*0.66)+' '+(yKnee-38)+' '+r1(x1 + g*TH*0.30)+' '+(yKnee-14)+
-         '" stroke="'+lite+'" stroke-width="'+r1(2+3*d.legs)+'" fill="none" stroke-linecap="round" opacity="'+r1(.26+.42*d.legs)+'"/>' +
-         /* rectus down the middle of the thigh */
-         '<path d="M'+r1(x0 + g*TH*0.06)+' '+(yThigh+22)+'Q'+r1(x0 + g*TH*0.16)+' '+(yKnee-40)+' '+r1(x1 + g*TH*0.04)+' '+(yKnee-20)+
-         '" stroke="'+shade+'" stroke-width="'+r1(1+1.6*d.legs)+'" fill="none" stroke-linecap="round" opacity=".5"/>' +
-         /* calf: two heads */
-         '<path d="M'+r1(x1 - g*CA*0.5)+' '+(yKnee+8)+'Q'+r1(x1 - g*CA*1.15)+' '+(yKnee+24)+' '+r1(x2 - g*CA*0.3)+' '+(yKnee+40)+
-         '" stroke="'+shade+'" stroke-width="'+r1(1.4+2*d.calves)+'" fill="none" stroke-linecap="round" opacity=".75"/>' +
-         '<path d="M'+r1(x1 + g*CA*0.42)+' '+(yKnee+10)+'Q'+r1(x1 + g*CA*0.95)+' '+(yKnee+22)+' '+r1(x2 + g*CA*0.2)+' '+(yKnee+38)+
-         '" stroke="'+lite+'" stroke-width="'+r1(1.4+2.2*d.calves)+'" fill="none" stroke-linecap="round" opacity="'+r1(.22+.4*d.calves)+'"/>' +
-         /* knee cap */
-         '<ellipse cx="'+x1+'" cy="'+yKnee+'" rx="'+r1(CA*0.95)+'" ry="'+r1(CA*0.7)+'" fill="'+lite+'" opacity=".42"/>' +
-         '<path d="M'+r1(x1-CA*0.8)+' '+(yKnee+CA*0.7)+'Q'+x1+' '+r1(yKnee+CA*1.15)+' '+r1(x1+CA*0.8)+' '+(yKnee+CA*0.7)+
-         '" stroke="'+shade+'" stroke-width="1" fill="none" opacity=".5"/>';
+    const x0 = r1(cx + g*hipX*wide), x1 = r1(cx + g*(hipX*wide+2)), x2 = r1(cx + g*(hipX*wide+0.5));
+    const toeOut = L.pose === 'abs' && g === 1;
+    s += '<path d="M'+x0+' '+(yCro+2)+'L'+x1+' '+yKnee+'" stroke="'+SKF+'" stroke-width="'+r1(TH*2)+'" stroke-linecap="round" fill="none"/>' +
+         '<path d="M'+x1+' '+(yKnee-4)+'L'+x2+' '+(yAnk-2)+'" stroke="'+SKF+'" stroke-width="'+r1(CA*2)+'" stroke-linecap="round" fill="none"/>';
+    if (rear){
+      /* glute and hamstring instead of quad */
+      s += '<path d="M'+r1(x0 - g*TH*0.7)+' '+(yCro-4)+'Q'+r1(x0 - g*TH*0.2)+' '+(yCro+16)+' '+r1(x0 + g*TH*0.8)+' '+(yCro+4)+
+           '" stroke="'+shade+'" stroke-width="'+r1(1.6+2*d.legs)+'" fill="none" stroke-linecap="round" opacity=".7"/>' +
+           '<path d="M'+r1(x0 + g*TH*0.05)+' '+(yCro+22)+'Q'+r1(x0 + g*TH*0.2)+' '+(yKnee-34)+' '+r1(x1 - g*TH*0.1)+' '+(yKnee-16)+
+           '" stroke="'+shade+'" stroke-width="'+r1(1.4+2.2*d.legs)+'" fill="none" stroke-linecap="round" opacity=".6"/>' +
+           '<path d="M'+r1(x0 + g*TH*0.5)+' '+(yCro+20)+'Q'+r1(x0 + g*TH*0.66)+' '+(yKnee-36)+' '+r1(x1 + g*TH*0.3)+' '+(yKnee-14)+
+           '" stroke="'+lite+'" stroke-width="'+r1(1.8+2.6*d.legs)+'" fill="none" stroke-linecap="round" opacity="'+r1(.22+.4*d.legs)+'"/>';
+    } else {
+      s += '<path d="M'+r1(x0 - g*TH*0.34)+' '+(yCro+10)+'Q'+r1(x0 - g*TH*0.5)+' '+r1((yCro+yKnee)/2)+' '+r1(x1 - g*TH*0.26)+' '+(yKnee-16)+
+           '" stroke="'+shade+'" stroke-width="'+r1(1.5+2*d.legs)+'" fill="none" stroke-linecap="round" opacity=".85"/>' +
+           '<path d="M'+r1(x0 + g*TH*0.46)+' '+(yCro+14)+'Q'+r1(x0 + g*TH*0.66)+' '+(yKnee-34)+' '+r1(x1 + g*TH*0.3)+' '+(yKnee-13)+
+           '" stroke="'+lite+'" stroke-width="'+r1(1.9+2.8*d.legs)+'" fill="none" stroke-linecap="round" opacity="'+r1(.26+.42*d.legs)+'"/>' +
+           '<path d="M'+r1(x0 + g*TH*0.06)+' '+(yCro+20)+'Q'+r1(x0 + g*TH*0.16)+' '+(yKnee-36)+' '+r1(x1 + g*TH*0.04)+' '+(yKnee-18)+
+           '" stroke="'+shade+'" stroke-width="'+r1(0.9+1.5*d.legs)+'" fill="none" stroke-linecap="round" opacity=".5"/>';
+    }
+    /* calves and knee */
+    s += '<path d="M'+r1(x1 - g*CA*0.5)+' '+(yKnee+8)+'Q'+r1(x1 - g*CA*1.15)+' '+(yKnee+22)+' '+r1(x2 - g*CA*0.3)+' '+(yKnee+38)+
+         '" stroke="'+shade+'" stroke-width="'+r1(1.3+1.8*d.calves)+'" fill="none" stroke-linecap="round" opacity=".75"/>' +
+         '<path d="M'+r1(x1 + g*CA*0.42)+' '+(yKnee+10)+'Q'+r1(x1 + g*CA*0.95)+' '+(yKnee+20)+' '+r1(x2 + g*CA*0.2)+' '+(yKnee+36)+
+         '" stroke="'+lite+'" stroke-width="'+r1(1.3+2*d.calves)+'" fill="none" stroke-linecap="round" opacity="'+r1(.22+.4*d.calves)+'"/>' +
+         (rear ? '' : '<ellipse cx="'+x1+'" cy="'+yKnee+'" rx="'+r1(CA*0.9)+'" ry="'+r1(CA*0.66)+'" fill="'+lite+'" opacity=".4"/>');
     if (L.tattoo === 'full')
-      s += '<path d="M'+x0+' '+(yThigh+14)+'L'+r1(x0 + (x1-x0)*0.55)+' '+r1(yThigh + (yKnee-yThigh)*0.55)+
+      s += '<path d="M'+x0+' '+(yCro+12)+'L'+r1(x0 + (x1-x0)*0.55)+' '+r1(yCro + (yKnee-yCro)*0.55)+
            '" stroke="'+ink+'" stroke-width="'+r1(TH*1.5)+'" fill="none" opacity=".34" stroke-dasharray="'+r1(TH*0.5)+' '+r1(TH*0.7)+'"/>';
-    s += foot(x2, yAnk, g);
+    s += foot(x2, g, toeOut);
   });
+  /* the wedge that keeps two thighs from reading as one leg */
+  const gw = r1(3 + 2*d.legs);
+  s += '<path d="M'+cx+' '+(yCro+8)+'L'+r1(cx+gw)+' '+(yCro+18)+'L'+cx+' '+(yKnee-26)+
+       'L'+r1(cx-gw)+' '+(yCro+18)+'Z" fill="'+deep+'"/>';
 
-  /* the wedge between the thighs, so two wide strokes are not one leg */
-  const gw = r1(3.4 + 2.2*d.legs), gTop = tBot - 15, gBot = yKnee - 24;
-  s += '<path d="M'+cx+' '+gTop+'L'+r1(cx+gw)+' '+r1(gTop+11)+'L'+cx+' '+gBot+
-       'L'+r1(cx-gw)+' '+r1(gTop+11)+'Z" fill="'+deep+'"/>';
-
-  /* ---------- trunks: cut to the hips, flared over the thighs ---------- */
-  const oR = r1(cx + hipX + TH*0.95), oL = r1(cx - hipX - TH*0.95), wb = r1(WW + 2.5);
-  s += '<path d="M'+r1(cx-wb)+' '+tTop+'H'+r1(cx+wb)+
-       'C'+r1(cx+wb+4)+' '+(tTop+16)+','+oR+' '+(tBot-14)+','+oR+' '+tBot+
-       'L'+r1(cx+hipX*0.32)+' '+tBot+'L'+cx+' '+(tBot-16)+'L'+r1(cx-hipX*0.32)+' '+tBot+
-       'L'+oL+' '+tBot+
-       'C'+oL+' '+(tBot-14)+','+r1(cx-wb-4)+' '+(tTop+16)+','+r1(cx-wb)+' '+tTop+
+  /* ---------- trunks: high-cut posing briefs ----------
+     A rectangle with a notch read as a mini-skirt. Real trunks sit on the
+     iliac crest and cut diagonally UP over the thigh, so the leg opening is
+     a curve from the outer hip in to the crotch. Note tR/tL are absolute x:
+     an earlier pass used the half-width itself as a coordinate and the whole
+     thing rendered as a sash across the hips. */
+  const tTop = yCro - 24;
+  const tWb  = r1(WW + 2), tHipW = r1(HW + 1.5);
+  const wL = r1(cx - tWb),  wR = r1(cx + tWb);
+  const tL = r1(cx - tHipW), tR = r1(cx + tHipW);
+  const legY = r1(yCro + 1);
+  s += '<path d="M'+wL+' '+tTop+'H'+wR+
+       'C'+r1(wR+3)+' '+(tTop+9)+','+tR+' '+(tTop+15)+','+tR+' '+legY+
+       'C'+r1(cx+HW-3)+' '+(yCro+9)+','+r1(cx+hipX+1)+' '+(yCro+13)+','+cx+' '+(yCro+7)+
+       'C'+r1(cx-hipX-1)+' '+(yCro+13)+','+r1(cx-HW+3)+' '+(yCro+9)+','+tL+' '+legY+
+       'C'+tL+' '+(tTop+15)+','+r1(wL-3)+' '+(tTop+9)+','+wL+' '+tTop+
        'Z" fill="url(#'+id+'t)"/>' +
-       /* waistband and the seam down each side */
-       '<path d="M'+r1(cx-wb)+' '+tTop+'H'+r1(cx+wb)+'v5H'+r1(cx-wb)+'Z" fill="rgba(0,0,0,.26)"/>' +
-       '<path d="M'+r1(cx-wb+2)+' '+(tTop+7)+'Q'+r1(oL+4)+' '+(tBot-14)+' '+r1(oL+3)+' '+(tBot-2)+
-       'M'+r1(cx+wb-2)+' '+(tTop+7)+'Q'+r1(oR-4)+' '+(tBot-14)+' '+r1(oR-3)+' '+(tBot-2)+
-       '" stroke="rgba(255,255,255,.20)" stroke-width="1.4" fill="none"/>';
+       '<path d="M'+wL+' '+tTop+'H'+wR+'v4.5H'+wL+'Z" fill="rgba(0,0,0,.26)"/>' +
+       '<path d="M'+r1(wL+1)+' '+(tTop+7)+'Q'+r1(tL+2)+' '+(tTop+16)+' '+r1(tL+2)+' '+r1(yCro-2)+
+       'M'+r1(wR-1)+' '+(tTop+7)+'Q'+r1(tR-2)+' '+(tTop+16)+' '+r1(tR-2)+' '+r1(yCro-2)+
+       '" stroke="rgba(255,255,255,.18)" stroke-width="1.3" fill="none"/>';
   if (L.acc === 'belt')
-    s += '<rect x="'+r1(cx-WW-4)+'" y="'+(tTop-14)+'" width="'+r1((WW+4)*2)+'" height="14" rx="2.5" fill="#5a3a1c"/>' +
-         '<rect x="'+r1(cx-WW-4)+'" y="'+(tTop-14)+'" width="'+r1((WW+4)*2)+'" height="4" rx="2" fill="rgba(255,255,255,.12)"/>' +
-         '<rect x="'+r1(cx-6)+'" y="'+(tTop-11)+'" width="12" height="8" rx="1.5" fill="#c9922f"/>';
+    s += '<rect x="'+r1(cx-WW-4)+'" y="'+(tTop-13)+'" width="'+r1((WW+4)*2)+'" height="13" rx="2.5" fill="#5a3a1c"/>' +
+         '<rect x="'+r1(cx-WW-4)+'" y="'+(tTop-13)+'" width="'+r1((WW+4)*2)+'" height="3.6" rx="1.8" fill="rgba(255,255,255,.12)"/>' +
+         '<rect x="'+r1(cx-5.5)+'" y="'+(tTop-10)+'" width="11" height="7.5" rx="1.5" fill="#c9922f"/>';
 
   /* ---------- arms ---------- */
   const arm = (g) => {
-    const sx = r1(cx + g*SD*0.80), sy = ySh + 5;
+    const sx = r1(cx + g*SD*0.80), sy = ySh + 4;
     let out = '', ex, ey, hx, hy, bulge = '', open = false;
-    if (L.pose === 'flex'){
-      ex = r1(cx + g*(SD + 12)); ey = ySh + 4;
-      hx = r1(cx + g*(SD - 4));  hy = ySh - 30;
-      bulge = '<ellipse cx="'+r1((sx+ex)/2 + g*2)+'" cy="'+(sy-6)+'" rx="'+r1(AU*1.05)+'" ry="'+r1(AU*0.82)+
-              '" fill="'+lite+'" opacity="'+r1(.45+.4*d.arms)+'"/>';
-    } else if (L.pose === 'lat'){
-      ex = r1(cx + g*(SD + 14)); ey = ySh + 34;
-      hx = r1(cx + g*(WW + 6));  hy = yWaist - 2;
+    const peak = () => '<ellipse cx="'+r1((sx+ex)/2 + g*2)+'" cy="'+r1((sy+ey)/2 - 5)+'" rx="'+r1(AU*1.02)+
+                       '" ry="'+r1(AU*0.8)+'" fill="'+lite+'" opacity="'+r1(.42+.4*d.arms)+'"/>';
+    if (L.pose === 'flex' || L.pose === 'back'){
+      ex = r1(cx + g*(SD + 11)); ey = ySh + 3;
+      hx = r1(cx + g*(SD - 5));  hy = ySh - 30;
+      bulge = peak();
+    } else if (L.pose === 'abs'){
+      /* hands behind the head, elbows wide */
+      ex = r1(cx + g*(SD + 8));  ey = ySh - 8;
+      hx = r1(cx + g*(headRx + 3)); hy = r1(headCy - 6);
+      bulge = peak();
+    } else if (L.pose === 'most'){
+      /* most muscular: both arms forward and down, hands meeting low */
+      ex = r1(cx + g*(SD + 5));  ey = ySh + 28;
+      hx = r1(cx + g*6);         hy = r1(yNav + 8);
+      bulge = peak();
+    } else if (L.pose === 'lat' || L.pose === 'backlat'){
+      ex = r1(cx + g*(SD + 12)); ey = ySh + 32;
+      hx = r1(cx + g*(WW + 5));  hy = yNav + 4;
     } else if (L.pose === 'cross'){
-      ex = r1(cx + g*(SD + 6));   ey = ySh + 31;
-      hx = r1(cx - g*(PW*0.5));   hy = r1(yPec + PH*1.45);
+      ex = r1(cx + g*(SD + 5));   ey = ySh + 30;
+      hx = r1(cx - g*(PW*0.5));   hy = r1(yNip + PH*1.4);
     } else if (L.pose === 'wave' || L.pose === 'wave2'){
-      /* animation-only: right arm up, left arm down, two frames so
-         alternating between them reads as an actual wave */
       if (g === 1){
-        ex = r1(cx + g*(SD + 9)); ey = ySh - 2;
-        hx = r1(cx + g*(SD + (L.pose === 'wave' ? 17 : 3)));
-        hy = ySh - (L.pose === 'wave' ? 34 : 40);
+        ex = r1(cx + g*(SD + 8)); ey = ySh - 3;
+        hx = r1(cx + g*(SD + (L.pose === 'wave' ? 16 : 3)));
+        hy = ySh - (L.pose === 'wave' ? 32 : 38);
         open = true;
       } else {
-        ex = r1(cx + g*(SD*0.94 + 5)); ey = ySh + 44;
-        hx = r1(cx + g*(WW + 13));     hy = yHip + 26;
+        ex = r1(cx + g*(SD*0.94 + 4)); ey = ySh + 40;
+        hx = r1(cx + g*(WW + 12));     hy = yCro + 22;
       }
     } else {
-      ex = r1(cx + g*(SD*0.94 + 5)); ey = ySh + 44;
-      hx = r1(cx + g*(WW + 13));     hy = yHip + 26;
+      ex = r1(cx + g*(SD*0.94 + 4)); ey = ySh + 40;
+      hx = r1(cx + g*(WW + 12));     hy = yCro + 22;
     }
     out += '<path d="M'+sx+' '+sy+'L'+ex+' '+ey+'" stroke="'+SKF+'" stroke-width="'+r1(AU*2)+'" stroke-linecap="round" fill="none"/>' + bulge +
            '<path d="M'+ex+' '+ey+'L'+hx+' '+hy+'" stroke="'+SKF+'" stroke-width="'+r1(AF*2)+'" stroke-linecap="round" fill="none"/>' +
-           /* tricep / bicep separation and the forearm cord */
            '<path d="M'+r1(sx + g*AU*0.55)+' '+(sy+4)+'L'+r1(ex + g*AU*0.4)+' '+(ey-3)+
-             '" stroke="'+shade+'" stroke-width="'+r1(1.2+1.8*d.arms)+'" stroke-linecap="round" opacity=".7"/>' +
+             '" stroke="'+shade+'" stroke-width="'+r1(1.1+1.7*d.arms)+'" stroke-linecap="round" opacity=".7"/>' +
            '<path d="M'+r1(ex - g*AF*0.3)+' '+r1(ey + (hy-ey)*0.2)+'L'+r1(hx - g*AF*0.2)+' '+r1(hy - (hy-ey)*0.22)+
-             '" stroke="'+shade+'" stroke-width="'+r1(0.9+1.3*d.arms)+'" stroke-linecap="round" opacity=".55"/>' +
-           '<circle cx="'+ex+'" cy="'+ey+'" r="'+r1(AF*0.75)+'" fill="'+lite+'" opacity=".3"/>';
-    /* a sleeve, on one arm — banded ink that always lands on the limb */
+             '" stroke="'+shade+'" stroke-width="'+r1(0.8+1.2*d.arms)+'" stroke-linecap="round" opacity=".55"/>' +
+           '<circle cx="'+ex+'" cy="'+ey+'" r="'+r1(AF*0.72)+'" fill="'+lite+'" opacity=".28"/>';
     if ((L.tattoo === 'sleeve' || L.tattoo === 'both' || L.tattoo === 'full') && g === 1)
       out += '<path d="M'+sx+' '+sy+'L'+ex+' '+ey+'" stroke="'+ink+'" stroke-width="'+r1(AU*1.55)+
              '" fill="none" opacity=".44" stroke-dasharray="'+r1(AU*0.72)+' '+r1(AU*0.52)+'"/>' +
              '<path d="M'+ex+' '+ey+'L'+hx+' '+hy+'" stroke="'+ink+'" stroke-width="'+r1(AF*1.5)+
              '" fill="none" opacity=".38" stroke-dasharray="'+r1(AF*0.5)+' '+r1(AF*0.85)+'"/>';
-    /* deltoid, three heads */
     out += '<circle cx="'+sx+'" cy="'+sy+'" r="'+r1(DR)+'" fill="'+SKF+'"/>' +
            '<path d="M'+r1(sx - g*DR*0.75)+' '+r1(sy-DR*0.3)+'A'+r1(DR)+' '+r1(DR)+' 0 0 '+(g>0?1:0)+' '+r1(sx + g*DR*0.2)+' '+r1(sy+DR*0.85)+
-             '" stroke="'+shade+'" stroke-width="'+r1(1.3+1.7*d.delts)+'" fill="none" stroke-linecap="round" opacity=".8"/>' +
+             '" stroke="'+shade+'" stroke-width="'+r1(1.2+1.6*d.delts)+'" fill="none" stroke-linecap="round" opacity=".8"/>' +
            '<path d="M'+r1(sx - g*DR*0.2)+' '+r1(sy-DR*0.8)+'A'+r1(DR*0.9)+' '+r1(DR*0.9)+' 0 0 '+(g>0?1:0)+' '+r1(sx + g*DR*0.6)+' '+r1(sy+DR*0.3)+
-             '" stroke="'+shade+'" stroke-width="'+r1(0.9+1.1*d.delts)+'" fill="none" stroke-linecap="round" opacity=".45"/>' +
-           '<ellipse cx="'+r1(sx + g*DR*0.18)+'" cy="'+r1(sy-DR*0.42)+'" rx="'+r1(DR*0.55)+'" ry="'+r1(DR*0.38)+
+             '" stroke="'+shade+'" stroke-width="'+r1(0.8+1*d.delts)+'" fill="none" stroke-linecap="round" opacity=".45"/>' +
+           '<ellipse cx="'+r1(sx + g*DR*0.18)+'" cy="'+r1(sy-DR*0.42)+'" rx="'+r1(DR*0.55)+'" ry="'+r1(DR*0.36)+
              '" fill="'+lite+'" opacity="'+r1(.3+.45*d.delts)+'"/>' +
            hand(hx, hy, ex, ey, g, open);
     if (L.acc === 'wraps')
-      out += '<path d="M'+r1(hx - g*AF*1.2)+' '+r1(hy - AF*1.7)+'l'+r1(g*AF*2.4)+' 0" stroke="#e8e8e8" stroke-width="5" stroke-linecap="round"/>';
+      out += '<path d="M'+r1(hx - g*AF*1.2)+' '+r1(hy - AF*1.7)+'l'+r1(g*AF*2.4)+' 0" stroke="#e8e8e8" stroke-width="4.6" stroke-linecap="round"/>';
     return out;
   };
-  const armsOverChest = L.pose === 'cross';
-  if (!armsOverChest) s += arm(-1) + arm(1);
+  const armsLast = L.pose === 'cross' || L.pose === 'most';
+  if (!armsLast) s += arm(-1) + arm(1);
 
   /* ---------- head ---------- */
-  let h =
-    /* a jaw, rather than an ellipse — this is most of what made him look drawn */
-    '<path d="M'+(cx-15)+' 30C'+(cx-15)+' 17,'+(cx-8)+' 12,'+cx+' 12' +
-    'C'+(cx+8)+' 12,'+(cx+15)+' 17,'+(cx+15)+' 30' +
-    'C'+(cx+15)+' 39,'+(cx+9)+' 47.5,'+cx+' 48.5' +
-    'C'+(cx-9)+' 47.5,'+(cx-15)+' 39,'+(cx-15)+' 30Z" fill="'+SKF+'"/>' +
-    '<ellipse cx="'+(cx-15)+'" cy="31" rx="2.6" ry="3.6" fill="'+SKF+'"/>' +
-    '<ellipse cx="'+(cx+15)+'" cy="31" rx="2.6" ry="3.6" fill="'+SKF+'"/>' +
-    '<path d="M'+(cx-14.5)+' 30.5q1.2 1.6 0 3.4M'+(cx+14.5)+' 30.5q-1.2 1.6 0 3.4" stroke="'+shade+'" stroke-width=".9" fill="none" opacity=".55"/>' +
-    /* cheekbone + jaw shading */
-    '<path d="M'+(cx-13)+' 31.5Q'+(cx-9)+' 36 '+(cx-6)+' 37.5M'+(cx+13)+' 31.5Q'+(cx+9)+' 36 '+(cx+6)+' 37.5" stroke="'+shade+'" stroke-width="1.1" fill="none" opacity=".4"/>' +
-    /* nose */
-    '<path d="M'+cx+' 31.5v4.5l2.2 1.4" stroke="'+shade+'" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".7"/>';
-  const bY = L.brow === 'hard' ? 27.5 : 27;
-  h += L.brow === 'hard'
-    ? '<path d="M'+(cx-9.5)+' '+(bY-1.4)+'l6 2M'+(cx+9.5)+' '+(bY-1.4)+'l-6 2" stroke="'+hc+'" stroke-width="2.4" stroke-linecap="round"/>'
-    : '<path d="M'+(cx-10)+' '+bY+'h6M'+(cx+4)+' '+bY+'h6" stroke="'+hc+'" stroke-width="2.1" stroke-linecap="round"/>';
-  if (L.acc === 'shades'){
-    h += '<path d="M'+(cx-12.5)+' '+(bY+2.2)+'h10v6h-10zM'+(cx+2.5)+' '+(bY+2.2)+'h10v6h-10z" fill="#11151a"/>' +
-         '<path d="M'+(cx-2.5)+' '+(bY+4)+'h5M'+(cx-12.5)+' '+(bY+2.2)+'l-2.5-1.6M'+(cx+12.5)+' '+(bY+2.2)+'l2.5-1.6" stroke="#11151a" stroke-width="1.7" stroke-linecap="round"/>' +
-         '<path d="M'+(cx-11.5)+' '+(bY+3.2)+'h3" stroke="rgba(255,255,255,.35)" stroke-width="1.2" stroke-linecap="round"/>';
+  let h = '';
+  if (rear){
+    /* the back of the head: a skull and hair, no face */
+    h += '<path d="M'+(cx-headRx)+' '+headCy+'C'+(cx-headRx)+' '+(headCy-15)+','+(cx-7)+' '+yCrown+','+cx+' '+yCrown+
+         'C'+(cx+7)+' '+yCrown+','+(cx+headRx)+' '+(headCy-15)+','+(cx+headRx)+' '+headCy+
+         'C'+(cx+headRx)+' '+(headCy+9)+','+(cx+8)+' '+(yChin-1)+','+cx+' '+yChin+
+         'C'+(cx-8)+' '+(yChin-1)+','+(cx-headRx)+' '+(headCy+9)+','+(cx-headRx)+' '+headCy+'Z" fill="'+SKF+'"/>' +
+         '<ellipse cx="'+(cx-headRx)+'" cy="'+(headCy+1)+'" rx="2.4" ry="3.3" fill="'+SKF+'"/>' +
+         '<ellipse cx="'+(cx+headRx)+'" cy="'+(headCy+1)+'" rx="2.4" ry="3.3" fill="'+SKF+'"/>';
+    /* hair covers the back of the skull for every style but bald */
+    if (L.hair !== 'bald')
+      h += '<path d="M'+(cx-headRx-0.5)+' '+(headCy+2)+'C'+(cx-headRx-0.5)+' '+(headCy-15)+','+(cx-7)+' '+(yCrown-1)+','+cx+' '+(yCrown-1)+
+           'C'+(cx+7)+' '+(yCrown-1)+','+(cx+headRx+0.5)+' '+(headCy-15)+','+(cx+headRx+0.5)+' '+(headCy+2)+
+           'q-'+headRx+' 5-'+(headRx*2)+' 0Z" fill="'+hc+'"/>';
+    h += hairBack();
+    if (L.acc === 'cap')      h += '<path d="M'+(cx-headRx-1)+' '+(headCy-4)+'q1-13 '+(headRx+1)+'-13t'+(headRx+1)+' 13z" fill="'+L.trunks+'"/>';
+    if (L.acc === 'headband') h += '<path d="M'+(cx-headRx-1)+' '+(headCy-6)+'q'+(headRx+1)+'-4 '+(headRx*2+2)+' 0v4.5q-'+(headRx+1)+'-4-'+(headRx*2+2)+' 0z" fill="'+L.trunks+'"/>';
   } else {
-    h += '<ellipse cx="'+(cx-5.2)+'" cy="'+(bY+3.6)+'" rx="2.5" ry="1.9" fill="#f4f6f8"/>' +
-         '<ellipse cx="'+(cx+5.2)+'" cy="'+(bY+3.6)+'" rx="2.5" ry="1.9" fill="#f4f6f8"/>' +
-         '<circle cx="'+(cx-5)+'" cy="'+(bY+3.7)+'" r="1.5" fill="#2b1d12"/>' +
-         '<circle cx="'+(cx+5)+'" cy="'+(bY+3.7)+'" r="1.5" fill="#2b1d12"/>';
+    h += '<path d="M'+(cx-headRx)+' '+headCy+'C'+(cx-headRx)+' '+(headCy-15)+','+(cx-7)+' '+yCrown+','+cx+' '+yCrown+
+         'C'+(cx+7)+' '+yCrown+','+(cx+headRx)+' '+(headCy-15)+','+(cx+headRx)+' '+headCy+
+         'C'+(cx+headRx)+' '+(headCy+9)+','+(cx+8)+' '+(yChin-1)+','+cx+' '+yChin+
+         'C'+(cx-8)+' '+(yChin-1)+','+(cx-headRx)+' '+(headCy+9)+','+(cx-headRx)+' '+headCy+'Z" fill="'+SKF+'"/>' +
+         '<ellipse cx="'+(cx-headRx)+'" cy="'+(headCy+1)+'" rx="2.4" ry="3.3" fill="'+SKF+'"/>' +
+         '<ellipse cx="'+(cx+headRx)+'" cy="'+(headCy+1)+'" rx="2.4" ry="3.3" fill="'+SKF+'"/>' +
+         '<path d="M'+(cx-headRx+1)+' '+(headCy+1)+'q1 1.5 0 3M'+(cx+headRx-1)+' '+(headCy+1)+'q-1 1.5 0 3" stroke="'+shade+'" stroke-width=".8" fill="none" opacity=".5"/>' +
+         '<path d="M'+(cx-11.5)+' '+(headCy+1)+'Q'+(cx-8)+' '+(headCy+6)+' '+(cx-5.5)+' '+(headCy+7.5)+
+         'M'+(cx+11.5)+' '+(headCy+1)+'Q'+(cx+8)+' '+(headCy+6)+' '+(cx+5.5)+' '+(headCy+7.5)+
+         '" stroke="'+shade+'" stroke-width="1" fill="none" opacity=".38"/>' +
+         '<path d="M'+cx+' '+(headCy+1)+'v4.2l2 1.3" stroke="'+shade+'" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".7"/>';
+    const bY = L.brow === 'hard' ? headCy - 4.2 : headCy - 4.6;
+    h += L.brow === 'hard'
+      ? '<path d="M'+(cx-8.5)+' '+(bY-1.2)+'l5.5 1.9M'+(cx+8.5)+' '+(bY-1.2)+'l-5.5 1.9" stroke="'+hc+'" stroke-width="2.2" stroke-linecap="round"/>'
+      : '<path d="M'+(cx-9)+' '+bY+'h5.5M'+(cx+3.5)+' '+bY+'h5.5" stroke="'+hc+'" stroke-width="1.9" stroke-linecap="round"/>';
+    if (L.acc === 'shades'){
+      h += '<path d="M'+(cx-11.5)+' '+(bY+2)+'h9.2v5.6h-9.2zM'+(cx+2.3)+' '+(bY+2)+'h9.2v5.6h-9.2z" fill="#11151a"/>' +
+           '<path d="M'+(cx-2.3)+' '+(bY+3.6)+'h4.6M'+(cx-11.5)+' '+(bY+2)+'l-2.3-1.5M'+(cx+11.5)+' '+(bY+2)+'l2.3-1.5" stroke="#11151a" stroke-width="1.6" stroke-linecap="round"/>' +
+           '<path d="M'+(cx-10.6)+' '+(bY+3)+'h2.8" stroke="rgba(255,255,255,.35)" stroke-width="1.1" stroke-linecap="round"/>';
+    } else {
+      h += '<ellipse cx="'+(cx-4.8)+'" cy="'+(bY+3.4)+'" rx="2.3" ry="1.75" fill="#f4f6f8"/>' +
+           '<ellipse cx="'+(cx+4.8)+'" cy="'+(bY+3.4)+'" rx="2.3" ry="1.75" fill="#f4f6f8"/>' +
+           '<circle cx="'+(cx-4.6)+'" cy="'+(bY+3.5)+'" r="1.35" fill="#2b1d12"/>' +
+           '<circle cx="'+(cx+4.6)+'" cy="'+(bY+3.5)+'" r="1.35" fill="#2b1d12"/>';
+    }
+    const mY = headCy + 10.5;
+    if (L.beard === 'full'){
+      h += '<path d="M'+(cx-11.5)+' '+(headCy+3)+'q.5 14 11.5 15t11.5-15q-3 8.5-11.5 8.5t-11.5-8.5z" fill="'+hc+'"/>' +
+           '<path d="M'+(cx-3.6)+' '+mY+'h7.2" stroke="#171717" stroke-width="1.7" stroke-linecap="round"/>';
+    } else {
+      h += '<path d="M'+(cx-3.4)+' '+mY+'q3.4 2.6 6.8 0" stroke="#3b2018" stroke-width="1.7" fill="none" stroke-linecap="round"/>';
+      if (L.beard === 'stache')  h += '<path d="M'+(cx-5.2)+' '+(mY-2.2)+'h10.4" stroke="'+hc+'" stroke-width="2.7" stroke-linecap="round"/>';
+      if (L.beard === 'goatee')  h += '<path d="M'+(cx-4.4)+' '+(mY+3.4)+'q4.4 3.4 8.8 0v-1.2q-4.4 2.2-8.8 0z" fill="'+hc+'"/>';
+      if (L.beard === 'stubble') h += '<path d="M'+(cx-10.5)+' '+(headCy+5)+'q2 9.5 10.5 9.5t10.5-9.5" stroke="'+hc+'" stroke-width="1.2" fill="none" opacity=".42" stroke-dasharray="1.5 2.4"/>';
+    }
+    h += hairTop(L, hc, cx, yCrown, headCy, headRx);
+    if (L.acc === 'headband') h += '<path d="M'+(cx-headRx-0.5)+' '+(headCy-9)+'q'+(headRx+0.5)+'-4.5 '+(headRx*2+1)+' 0v4.6q-'+(headRx+0.5)+'-4.5-'+(headRx*2+1)+' 0z" fill="'+L.trunks+'"/>';
+    if (L.acc === 'cap')      h += '<path d="M'+(cx-headRx-1)+' '+(headCy-8)+'q1.8-12.5 '+(headRx+1)+'-12.5t'+(headRx+1)+' 12.5z" fill="'+L.trunks+'"/>' +
+                                   '<path d="M'+(cx-headRx-1)+' '+(headCy-8)+'h'+(headRx*2-4)+'l8 3.4H'+(cx-headRx-1)+'z" fill="'+mix(L.trunks,'#000000',.28)+'"/>';
+    if (L.acc === 'chain')    h += '<path d="M'+(cx-9)+' '+(yChin+3)+'q9 9.5 18 0" stroke="#c9922f" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
   }
-  if (L.beard === 'full'){
-    h += '<path d="M'+(cx-13)+' 32.5q.5 15 13 16.5t13-16.5q-3.5 9.5-13 9.5t-13-9.5z" fill="'+hc+'"/>' +
-         '<path d="M'+(cx-4)+' 40.5h8" stroke="#171717" stroke-width="1.8" stroke-linecap="round"/>';
-  } else {
-    h += '<path d="M'+(cx-3.8)+' 40.5q3.8 2.8 7.6 0" stroke="#3b2018" stroke-width="1.8" fill="none" stroke-linecap="round"/>';
-    if (L.beard === 'stache')  h += '<path d="M'+(cx-5.8)+' 38.4h11.6" stroke="'+hc+'" stroke-width="2.9" stroke-linecap="round"/>';
-    if (L.beard === 'goatee')  h += '<path d="M'+(cx-4.8)+' 44q4.8 3.6 9.6 0v-1.3q-4.8 2.3-9.6 0z" fill="'+hc+'"/>';
-    if (L.beard === 'stubble') h += '<path d="M'+(cx-12)+' 35q2 10.5 12 10.5t12-10.5" stroke="'+hc+'" stroke-width="1.3" fill="none" opacity=".42" stroke-dasharray="1.6 2.6"/>';
-  }
-  if (L.hair === 'buzz')    h += '<path d="M'+(cx-14.5)+' 26q1-13 14.5-13t14.5 13q-4.5-6-14.5-6t-14.5 6z" fill="'+hc+'"/>';
-  if (L.hair === 'short')   h += '<path d="M'+(cx-15)+' 28q0-16 15-16t15 16q-3-9.5-15-9.5t-15 9.5z" fill="'+hc+'"/>';
-  if (L.hair === 'flattop') h += '<path d="M'+(cx-15)+' 23v-8h30v8q-4.5-5.5-15-5.5t-15 5.5z" fill="'+hc+'"/>';
-  if (L.hair === 'curly')   h += '<circle cx="'+(cx-8)+'" cy="16" r="6.8" fill="'+hc+'"/><circle cx="'+cx+'" cy="12.5" r="7.2" fill="'+hc+'"/><circle cx="'+(cx+8)+'" cy="16" r="6.8" fill="'+hc+'"/>';
-  if (L.hair === 'afro')    h += '<path d="M'+(cx-16.5)+' 24q0-16.5 16.5-16.5t16.5 16.5q-5-8.5-16.5-8.5t-16.5 8.5z" fill="'+hc+'"/>';
-  if (L.hair === 'long' || L.hair === 'ponytail' || L.hair === 'mullet' || L.hair === 'dreads')
-    h += '<path d="M'+(cx-15)+' 25q1-14 15-14t15 14q-4.5-7.5-15-7.5t-15 7.5z" fill="'+hc+'"/>';
-  if (L.hair === 'bald')    h += '<path d="M'+(cx-7)+' 17.5q7-4.5 14 0" stroke="rgba(255,255,255,.24)" stroke-width="1.8" fill="none" stroke-linecap="round"/>';
-  if (L.acc === 'headband') h += '<path d="M'+(cx-15)+' 24q15-5 30 0v4.5q-15-5-30 0z" fill="'+L.trunks+'"/>';
-  if (L.acc === 'cap')      h += '<path d="M'+(cx-15)+' 23.5q2-13 15-13t15 13z" fill="'+L.trunks+'"/>' +
-                                 '<path d="M'+(cx-15)+' 23.5h22l8.5 3.6H'+(cx-15)+'z" fill="'+mix(L.trunks,'#000000',.28)+'"/>';
-  if (L.acc === 'chain')    h += '<path d="M'+(cx-10)+' 50q10 10 20 0" stroke="#c9922f" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
-  /* a touch larger than life: at true bodybuilder ratios the head reads as sunken */
-  s += '<g transform="translate('+cx+' 31) scale(1.08) translate(-'+cx+' -31)">' + h + '</g>';
-  if (armsOverChest) s += arm(-1) + arm(1);
+  s += h;
+  if (armsLast) s += arm(-1) + arm(1);
 
   const bust = o.crop === 'bust';
-  /* cropped to where the figure actually is, so a small card is not
-     mostly empty canvas */
-  const box  = bust ? (cx-33) + ' 10 66 72' : '2 4 166 292';
-  const vbW  = bust ? 66 : 166, vbH = bust ? 72 : 292;
+  const box  = bust ? (cx-31) + ' 11 62 66' : '2 4 166 292';
+  const vbW  = bust ? 62 : 166, vbH = bust ? 66 : 292;
   const ph   = o.h || 200;
   return '<svg class="mmf" viewBox="'+box+'" width="'+r1(ph*vbW/vbH)+'" height="'+ph+'" role="img" aria-hidden="true">' + s + '</svg>';
+}
+
+/* ------------------------------------------------------------
+   Hair, drawn against the head landmarks rather than guessed at.
+   Kept out of mmFigure so adding a style is a one-line change.
+------------------------------------------------------------ */
+function hairTop(L, hc, cx, yCrown, headCy, R){
+  const t = headCy - 11;                    // hairline
+  const dark = mix(hc, '#000000', .3);
+  switch (L.hair){
+    case 'bald':
+      return '<path d="M'+(cx-6)+' '+(yCrown+4)+'q6-4 12 0" stroke="rgba(255,255,255,.22)" stroke-width="1.7" fill="none" stroke-linecap="round"/>';
+    case 'buzz':
+      return '<path d="M'+(cx-R-0.5)+' '+(t+2)+'C'+(cx-R-0.5)+' '+(yCrown-1)+','+(cx-6)+' '+(yCrown-2)+','+cx+' '+(yCrown-2)+
+             'C'+(cx+6)+' '+(yCrown-2)+','+(cx+R+0.5)+' '+(yCrown-1)+','+(cx+R+0.5)+' '+(t+2)+
+             'q-'+R+' -4.5-'+(R*2)+' 0Z" fill="'+hc+'"/>';
+    case 'crew':
+      return '<path d="M'+(cx-R-0.5)+' '+(t+1)+'C'+(cx-R-0.5)+' '+(yCrown-3)+','+(cx-6)+' '+(yCrown-4)+','+cx+' '+(yCrown-4)+
+             'C'+(cx+6)+' '+(yCrown-4)+','+(cx+R+0.5)+' '+(yCrown-3)+','+(cx+R+0.5)+' '+(t+1)+
+             'q-'+R+' -6-'+(R*2)+' 0Z" fill="'+hc+'"/>' +
+             '<path d="M'+(cx-R)+' '+(t+1)+'q'+R+' -3 '+(R*2)+' 0" stroke="'+dark+'" stroke-width="2" fill="none"/>';
+    case 'flattop':
+      return '<path d="M'+(cx-R-1)+' '+(t+1)+'V'+(yCrown-5)+'h'+(R*2+2)+'v'+(t+6-yCrown)+
+             'q-'+(R+1)+' -5-'+(R*2+2)+' 0Z" fill="'+hc+'"/>';
+    case 'short':
+      return '<path d="M'+(cx-R-1)+' '+(t+4)+'C'+(cx-R-1)+' '+(yCrown-4)+','+(cx-6)+' '+(yCrown-5)+','+cx+' '+(yCrown-5)+
+             'C'+(cx+6)+' '+(yCrown-5)+','+(cx+R+1)+' '+(yCrown-4)+','+(cx+R+1)+' '+(t+4)+
+             'q-4 -6-'+(R-2)+' -6t-'+(R-2)+' 6q-4 0-4 0Z" fill="'+hc+'"/>';
+    case 'slick':
+      return '<path d="M'+(cx-R-1)+' '+(t+3)+'C'+(cx-R-1)+' '+(yCrown-4)+','+(cx-4)+' '+(yCrown-6)+','+(cx+R+2)+' '+(yCrown-1)+
+             'C'+(cx+R+1)+' '+(yCrown+5)+','+(cx+R)+' '+(t)+','+(cx+R+1)+' '+(t+3)+
+             'q-'+(R+1)+' -5-'+(R*2+2)+' 0Z" fill="'+hc+'"/>';
+    case 'curly':
+      return '<circle cx="'+(cx-7.5)+'" cy="'+(yCrown+3)+'" r="6.2" fill="'+hc+'"/>' +
+             '<circle cx="'+cx+'" cy="'+(yCrown-0.5)+'" r="6.8" fill="'+hc+'"/>' +
+             '<circle cx="'+(cx+7.5)+'" cy="'+(yCrown+3)+'" r="6.2" fill="'+hc+'"/>' +
+             '<circle cx="'+(cx-11)+'" cy="'+(yCrown+9)+'" r="4.6" fill="'+hc+'"/>' +
+             '<circle cx="'+(cx+11)+'" cy="'+(yCrown+9)+'" r="4.6" fill="'+hc+'"/>';
+    case 'afro':
+      return '<path d="M'+(cx-R-3)+' '+(t+3)+'a'+(R+3)+' '+(R+4)+' 0 0 1 '+(R*2+6)+' 0q-'+(R+3)+' -6-'+(R*2+6)+' 0Z" fill="'+hc+'"/>';
+    case 'cornrows':
+      return '<path d="M'+(cx-R-0.5)+' '+(t+2)+'C'+(cx-R-0.5)+' '+(yCrown-1)+','+(cx-6)+' '+(yCrown-2)+','+cx+' '+(yCrown-2)+
+             'C'+(cx+6)+' '+(yCrown-2)+','+(cx+R+0.5)+' '+(yCrown-1)+','+(cx+R+0.5)+' '+(t+2)+
+             'q-'+R+' -4.5-'+(R*2)+' 0Z" fill="'+hc+'"/>' +
+             [-9,-4.5,0,4.5,9].map(dx =>
+               '<path d="M'+(cx+dx)+' '+(yCrown-1)+'V'+(t+2)+'" stroke="'+dark+'" stroke-width="1.5"/>').join('');
+    case 'topknot':
+      return '<path d="M'+(cx-R-0.5)+' '+(t+2)+'C'+(cx-R-0.5)+' '+(yCrown+1)+','+(cx-6)+' '+yCrown+','+cx+' '+yCrown+
+             'C'+(cx+6)+' '+yCrown+','+(cx+R+0.5)+' '+(yCrown+1)+','+(cx+R+0.5)+' '+(t+2)+
+             'q-'+R+' -4.5-'+(R*2)+' 0Z" fill="'+hc+'"/>';
+    default:   /* long, ponytail, mullet, dreads all share a front hairline */
+      return '<path d="M'+(cx-R-1)+' '+(t+3)+'C'+(cx-R-1)+' '+(yCrown-4)+','+(cx-6)+' '+(yCrown-5)+','+cx+' '+(yCrown-5)+
+             'C'+(cx+6)+' '+(yCrown-5)+','+(cx+R+1)+' '+(yCrown-4)+','+(cx+R+1)+' '+(t+3)+
+             'q-'+(R+1)+' -6.5-'+(R*2+2)+' 0Z" fill="'+hc+'"/>';
+  }
 }
 
 /* ============================================================
@@ -7149,7 +7256,8 @@ ACTS.chReset = () => {
    a loop in CSS — waves, flexes, settles, waves again. No timers
    to leak, and under prefers-reduced-motion he simply stands.
 ------------------------------------------------------------ */
-const GREET_FRAMES = ['relaxed','wave','wave2','flex'];
+/* the routine, in order: he waves you in, then runs the round */
+const GREET_FRAMES = ['relaxed','wave','wave2','flex','abs','back','most'];
 function charFrames(h){
   const dev = charDev();
   return GREET_FRAMES.map((p,i) => '<span class="gf g' + i + '">' +

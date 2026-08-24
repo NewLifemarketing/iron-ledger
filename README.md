@@ -24,8 +24,11 @@ Ten levels, Untrained through Monster. A week of honest training is about a leve
 The Development list shows each region against where it stood thirty days ago, so you can see where you are actually
 growing and where you are only busy.
 
-He is never still: on the home page and in the sidebar he waves, flexes and settles on a loop. Cosmetics include
-skin, hair, beard, brow, gear (belt, wraps, shades, cap, chain) and ink — an arm sleeve, a chest piece, or both.
+He runs a full posing round on a loop — waves you in, front double biceps, abs and thighs, rear double biceps,
+most muscular, then stands back down. He does it on the home page, in the sidebar, and on the way in.
+
+Cosmetics: 14 hair styles and 10 colours, skin, beard, brow, gear (belt, wraps, shades, cap, chain), trunks,
+ink (arm sleeve, chest piece, or fully inked), and seven poses to hold when he is standing still.
 
 ## Eight coaches
 
