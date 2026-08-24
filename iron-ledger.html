@@ -6325,6 +6325,8 @@ function boot(){
 
 
 
+
+
 <script>
 /* ============================================================
    PHYSIQUE
@@ -6355,7 +6357,8 @@ const ACC_N    = { none:'None', shades:'Shades', headband:'Headband', cap:'Cap',
 const TRUNKS   = ['#c8102e','#0057b8','#ffd100','#009639','#8b1f8b','#d95926','#1baf7a','#15191e','#e8e8e8','#4a3aa7'];
 const POSES    = ['relaxed','flex','abs','back','most','lat','cross'];
 const TATTOOS  = ['none','sleeve','chest','both','full'];
-const TATTOO_N = { none:'None', sleeve:'Arm sleeve', chest:'Chest piece', both:'Sleeve + chest', full:'Fully inked' };
+const TATTOO_N = { none:'No ink', sleeve:'Blackwork sleeve', chest:'Chest piece',
+                   both:'Sleeve + chest', full:'Full blackwork' };
 const POSE_N   = { relaxed:'Stood relaxed', flex:'Front double bi', abs:'Abs and thighs',
                    back:'Rear double bi', most:'Most muscular', lat:'Lat spread',
                    cross:'Arms crossed' };
@@ -6384,6 +6387,19 @@ function mix(a, b, t){
    dev:  { delts chest back traps arms abs legs calves }  0..1
    opt:  { h:pixel height, crop:'full'|'bust' }
 ------------------------------------------------------------ */
+/* When he holds a pose the working muscles actually swell and the separations
+   sharpen — a flex that does not change the body is just a different arm
+   position. These are added to the development values before anything is
+   measured, so the geometry changes, not only the shading. */
+const FLEX_BOOST = {
+  flex: { arms:.26, delts:.14, chest:.10, back:.08, traps:.06 },
+  back: { back:.26, traps:.18, arms:.18, delts:.10 },
+  most: { chest:.24, arms:.16, traps:.16, delts:.10, abs:.10 },
+  abs:  { abs:.28, legs:.12, delts:.08 },
+  lat:  { back:.28, delts:.12, chest:.08 },
+  backlat: { back:.30, delts:.12, traps:.14 },
+  wave: { arms:.06 }, wave2: { arms:.06 }
+};
 const REAR_POSES = { back:1, backlat:1 };
 let _mmSeq = 0;
 
@@ -6392,7 +6408,11 @@ function mmFigure(look, dev, opt){
   const L  = Object.assign({ skin:SKINS[2], hair:'buzz', hairCol:'#2b2118', beard:'none',
                              brow:'calm', acc:'none', trunks:'#c8102e', pose:'relaxed',
                              tattoo:'none' }, look || {});
-  const d  = Object.assign(devFlat(0.4), dev || {});
+  const d0 = Object.assign(devFlat(0.4), dev || {});
+  const fb = FLEX_BOOST[(look || {}).pose] || null;
+  const d  = {};
+  DEV_KEYS.forEach(k => d[k] = cl01(d0[k] + (fb ? (fb[k] || 0) : 0)));
+  const defn = fb ? 1.4 : 1;                  /* separations bite harder mid-pose */
   const id = 'mm' + (++_mmSeq);
   const cx = 85, hc = L.hairCol, sk = L.skin;
   const lite  = mix(sk, '#fff3e4', .24);
@@ -6502,7 +6522,15 @@ function mmFigure(look, dev, opt){
   if (!rear) s += hairBack();
 
   /* ---------- neck + traps ---------- */
-  s += '<path d="M'+r1(cx-NW)+' '+(yChin-6)+'h'+r1(NW*2)+'v'+(ySh-yChin+10)+'h'+r1(-NW*2)+'z" fill="'+deep+'"/>';
+  /* Neck: tapered and in skin, with the shadow under the jaw drawn ON it.
+     A flat dark rectangle here read as a hole between head and shoulders. */
+  s += '<path d="M'+r1(cx-NW*0.84)+' '+(yChin-9)+
+       'C'+r1(cx-NW*0.9)+' '+(yChin+2)+','+r1(cx-NW)+' '+(ySh-9)+','+r1(cx-NW-2)+' '+(ySh+3)+
+       'L'+r1(cx+NW+2)+' '+(ySh+3)+
+       'C'+r1(cx+NW)+' '+(ySh-9)+','+r1(cx+NW*0.9)+' '+(yChin+2)+','+r1(cx+NW*0.84)+' '+(yChin-9)+
+       'Z" fill="'+SKF+'"/>' +
+       '<path d="M'+r1(cx-NW*0.84)+' '+(yChin-8)+'Q'+cx+' '+(yChin-1)+' '+r1(cx+NW*0.84)+' '+(yChin-8)+
+       '" stroke="'+shade+'" stroke-width="2.6" fill="none" opacity=".45"/>';
   if (!rear)
     s += '<path d="M'+r1(cx-NW*0.5)+' '+(yChin-3)+'l1.8 14M'+r1(cx+NW*0.5)+' '+(yChin-3)+'l-1.8 14" ' +
          'stroke="'+shade+'" stroke-width="1.3" stroke-linecap="round" opacity=".5"/>';
@@ -6522,14 +6550,14 @@ function mmFigure(look, dev, opt){
 
   if (rear){
     /* ----- the back: traps, lats, erectors ----- */
-    const tOp = r1(.35 + .45*d.traps);
+    const tOp = r1(cl01((.35 + .45*d.traps)*defn));
     s += '<path d="M'+r1(cx-NW-2)+' '+(yChin+2)+'C'+r1(cx-SD*0.5)+' '+(ySh+2)+','+r1(cx-SD*0.62)+' '+(ySh+16)+','+r1(cx-WW*0.5)+' '+(yNip+14)+
          'L'+r1(cx+WW*0.5)+' '+(yNip+14)+'C'+r1(cx+SD*0.62)+' '+(ySh+16)+','+r1(cx+SD*0.5)+' '+(ySh+2)+','+r1(cx+NW+2)+' '+(yChin+2)+
          'Z" fill="'+shade+'" opacity="'+tOp+'"/>';
     [-1,1].forEach(g => {
       s += '<path d="M'+r1(cx+g*SD*0.78)+' '+(ySh+6)+
            'C'+r1(cx+g*(SD*0.9))+' '+(ySh+22)+','+r1(cx+g*(WW+LF*0.8))+' '+(yNav-18)+','+r1(cx+g*(WW-1))+' '+(yNav+2)+
-           'L'+r1(cx+g*2)+' '+(yNip+16)+'Z" fill="'+lite+'" opacity="'+r1(.30+.42*d.back)+'"/>';
+           'L'+r1(cx+g*2)+' '+(yNip+16)+'Z" fill="'+lite+'" opacity="'+r1(cl01((.30+.42*d.back)*defn))+'"/>';
     });
     s += '<path d="M'+r1(cx-3)+' '+(yNip+8)+'V'+(yCro-6)+'M'+r1(cx+3)+' '+(yNip+8)+'V'+(yCro-6)+
          '" stroke="'+shade+'" stroke-width="'+r1(2+2.4*d.traps)+'" stroke-linecap="round" opacity=".6"/>' +
@@ -6548,20 +6576,40 @@ function mmFigure(look, dev, opt){
     });
     s += '<path d="M'+cx+' '+r1(yNip-2)+'v'+r1(PH*1.55)+'" stroke="'+deep+'" stroke-width="'+r1(1.1+1.3*d.chest)+'" stroke-linecap="round" opacity=".7"/>' +
          '<path d="M'+r1(cx-PW+1)+' '+r1(pecY+PH*0.72)+'Q'+cx+' '+r1(pecY+PH*1.1)+' '+r1(cx+PW-1)+' '+r1(pecY+PH*0.72)+
-         '" stroke="'+shade+'" stroke-width="'+r1(1.3+1.5*d.chest)+'" fill="none" stroke-linecap="round"/>' +
+         '" stroke="'+shade+'" stroke-width="'+r1((1.3+1.5*d.chest)*defn)+'" fill="none" stroke-linecap="round"/>' +
          '<path d="M'+r1(cx-NW-1)+' '+(yNip-7)+'Q'+r1(cx-PW*0.6)+' '+(yNip-3)+' '+r1(cx-PW)+' '+(yNip-5)+
          'M'+r1(cx+NW+1)+' '+(yNip-7)+'Q'+r1(cx+PW*0.6)+' '+(yNip-3)+' '+r1(cx+PW)+' '+(yNip-5)+
          '" stroke="'+shade+'" stroke-width="1.1" fill="none" opacity=".5"/>';
 
     if (L.tattoo === 'chest' || L.tattoo === 'both' || L.tattoo === 'full'){
-      const iy = r1(yNip + 3);
-      [-1,1].forEach(g => {
-        s += '<path d="M'+r1(cx + g*2)+' '+iy+
-             'Q'+r1(cx + g*PW*0.55)+' '+r1(iy-4)+' '+r1(cx + g*PW*0.92)+' '+r1(iy+3)+
-             'Q'+r1(cx + g*PW*0.55)+' '+r1(iy+4)+' '+r1(cx + g*2)+' '+r1(iy+7)+'Z" fill="'+ink+'" opacity=".72"/>' +
-             '<path d="M'+r1(cx + g*PW*0.30)+' '+r1(iy+9)+'L'+r1(cx + g*PW*0.78)+' '+r1(iy+12)+
-             '" stroke="'+ink+'" stroke-width="1.9" stroke-linecap="round" opacity=".6"/>';
-      });
+      /* A pec-and-delt cap on one side, masked to the torso. A symmetric
+         ornament across both pecs read as a bat sitting on his chest; real
+         chest work runs off the shoulder it joins, so this is asymmetric and
+         lands on the same side as the sleeve. */
+      const cm = id + 'c', g = 1, top = r1(yNip - 4);
+      s += '<mask id="'+cm+'" maskUnits="userSpaceOnUse">' +
+        '<path d="M'+r1(cx-SD*0.76)+' '+ySh+
+        'C'+r1(cx-SD*0.95)+' '+(ySh+14)+','+r1(cx-WW-LF)+' '+(yNav-16)+','+r1(cx-WW)+' '+yNav+
+        'L'+r1(cx+WW)+' '+yNav+
+        'C'+r1(cx+WW+LF)+' '+(yNav-16)+','+r1(cx+SD*0.95)+' '+(ySh+14)+','+r1(cx+SD*0.76)+' '+ySh+
+        'Z" fill="#fff"/></mask>' +
+        '<g mask="url(#'+cm+')">' +
+          /* solid over the outer half of the pec, feathering in toward the sternum */
+          '<path d="M'+r1(cx + g*PW*1.15)+' '+r1(top-4)+
+          'C'+r1(cx + g*PW*0.3)+' '+r1(top-2)+','+r1(cx + g*PW*0.24)+' '+r1(top+PH*0.8)+','+r1(cx + g*PW*0.6)+' '+r1(top+PH*1.5)+
+          'C'+r1(cx + g*PW*0.95)+' '+r1(top+PH*1.9)+','+r1(cx + g*PW*1.2)+' '+r1(top+PH*1.2)+','+r1(cx + g*PW*1.25)+' '+r1(top+PH*0.4)+
+          'Z" fill="'+ink+'" opacity=".86"/>' +
+          /* negative space cut back out of it */
+          '<path d="M'+r1(cx + g*PW*1.1)+' '+r1(top+2)+'Q'+r1(cx + g*PW*0.52)+' '+r1(top+PH*0.5)+' '+r1(cx + g*PW*0.72)+' '+r1(top+PH*1.35)+
+          '" stroke="'+sk+'" stroke-width="2" fill="none" opacity=".85"/>' +
+          '<path d="M'+r1(cx + g*PW*1.18)+' '+r1(top+PH*0.55)+'Q'+r1(cx + g*PW*0.8)+' '+r1(top+PH*0.75)+' '+r1(cx + g*PW*0.9)+' '+r1(top+PH*1.5)+
+          '" stroke="'+sk+'" stroke-width="1.4" fill="none" opacity=".7"/>' +
+          /* two tapering flicks reaching toward the sternum */
+          '<path d="M'+r1(cx + g*PW*0.34)+' '+r1(top+PH*0.35)+'q'+r1(-g*PW*0.26)+' 2 '+r1(-g*PW*0.34)+' 7" stroke="'+ink+
+          '" stroke-width="2.4" fill="none" opacity=".8" stroke-linecap="round"/>' +
+          '<path d="M'+r1(cx + g*PW*0.4)+' '+r1(top+PH*1.05)+'q'+r1(-g*PW*0.2)+' 3 '+r1(-g*PW*0.26)+' 8" stroke="'+ink+
+          '" stroke-width="1.8" fill="none" opacity=".65" stroke-linecap="round"/>' +
+        '</g>';
     }
     if (cut > 0.14){
       const aTop = r1(yNip + PH*1.6), rows = cut > 0.62 ? 4 : 3;
@@ -6575,7 +6623,7 @@ function mmFigure(look, dev, opt){
       abs += '<path d="M'+cx+' '+aTop+'V'+r1(yNav+4)+'" stroke="'+shade+'" stroke-width="1.2" stroke-linecap="round"/>' +
              '<path d="M'+r1(cx-WW+1)+' '+r1(aTop+2)+'l4.5 4.5M'+r1(cx-WW+2)+' '+r1(aTop+10)+'l4.5 3.6" stroke="'+shade+'" stroke-width="1.4" stroke-linecap="round"/>' +
              '<path d="M'+r1(cx+WW-1)+' '+r1(aTop+2)+'l-4.5 4.5M'+r1(cx+WW-2)+' '+r1(aTop+10)+'l-4.5 3.6" stroke="'+shade+'" stroke-width="1.4" stroke-linecap="round"/>';
-      s += '<g opacity="'+r1(0.25 + 0.75*cut)+'">' + abs + '</g>';
+      s += '<g opacity="'+r1(cl01((0.25 + 0.75*cut) * defn))+'">' + abs + '</g>';
     }
   }
 
@@ -6608,15 +6656,27 @@ function mmFigure(look, dev, opt){
          '<path d="M'+r1(x1 + g*CA*0.42)+' '+(yKnee+10)+'Q'+r1(x1 + g*CA*0.95)+' '+(yKnee+20)+' '+r1(x2 + g*CA*0.2)+' '+(yKnee+36)+
          '" stroke="'+lite+'" stroke-width="'+r1(1.3+2*d.calves)+'" fill="none" stroke-linecap="round" opacity="'+r1(.22+.4*d.calves)+'"/>' +
          (rear ? '' : '<ellipse cx="'+x1+'" cy="'+yKnee+'" rx="'+r1(CA*0.9)+'" ry="'+r1(CA*0.66)+'" fill="'+lite+'" opacity=".4"/>');
-    if (L.tattoo === 'full')
-      s += '<path d="M'+x0+' '+(yCro+12)+'L'+r1(x0 + (x1-x0)*0.55)+' '+r1(yCro + (yKnee-yCro)*0.55)+
-           '" stroke="'+ink+'" stroke-width="'+r1(TH*1.5)+'" fill="none" opacity=".34" stroke-dasharray="'+r1(TH*0.5)+' '+r1(TH*0.7)+'"/>';
+    /* the crease between the thighs, shaded on each leg */
+    s += '<path d="M'+r1(x0 - g*TH*0.84)+' '+(yCro+5)+'Q'+r1(x0 - g*TH*0.74)+' '+(yCro+34)+' '+r1(x1 - g*TH*0.52)+' '+(yKnee-24)+
+         '" stroke="'+shade+'" stroke-width="'+r1(2.4+2*d.legs)+'" fill="none" stroke-linecap="round" opacity=".5"/>';
+    if (L.tattoo === 'full'){
+      /* masked to the thigh so the band cannot spill off the leg */
+      const lm = id + 'l' + (g > 0 ? 'r' : 'l');
+      s += '<mask id="'+lm+'" maskUnits="userSpaceOnUse">' +
+           '<path d="M'+x0+' '+(yCro+2)+'L'+x1+' '+yKnee+'" stroke="#fff" stroke-width="'+r1(TH*2)+
+           '" stroke-linecap="round" fill="none"/></mask>' +
+           '<g mask="url(#'+lm+')">' +
+             '<path d="M'+r1(x0-TH)+' '+(yCro+16)+'h'+r1(TH*2)+'v'+r1(TH*1.5)+'h'+r1(-TH*2)+'z" fill="'+ink+'" opacity=".82"/>' +
+             '<path d="M'+r1(x0-TH)+' '+r1(yCro+18+TH*0.5)+'q'+TH+' 5 '+r1(TH*2)+' 0" stroke="'+sk+
+             '" stroke-width="'+r1(TH*0.28)+'" fill="none" opacity=".85"/>' +
+             '<path d="M'+r1(x0-TH*0.5)+' '+(yCro+34)+'q'+r1(TH*0.5)+' 8 '+TH+' 2" stroke="'+ink+
+             '" stroke-width="'+r1(TH*0.34)+'" fill="none" opacity=".7" stroke-linecap="round"/>' +
+           '</g>';
+    }
     s += foot(x2, g, toeOut);
   });
-  /* the wedge that keeps two thighs from reading as one leg */
-  const gw = r1(3 + 2*d.legs);
-  s += '<path d="M'+cx+' '+(yCro+8)+'L'+r1(cx+gw)+' '+(yCro+18)+'L'+cx+' '+(yKnee-26)+
-       'L'+r1(cx-gw)+' '+(yCro+18)+'Z" fill="'+deep+'"/>';
+  /* No wedge between the legs. A filled shape in there read as a brown object
+     sitting between his thighs; the crease is shaded on each leg instead. */
 
   /* ---------- trunks: high-cut posing briefs ----------
      A rectangle with a notch read as a mini-skirt. Real trunks sit on the
@@ -6649,7 +6709,7 @@ function mmFigure(look, dev, opt){
     const sx = r1(cx + g*SD*0.80), sy = ySh + 4;
     let out = '', ex, ey, hx, hy, bulge = '', open = false;
     const peak = () => '<ellipse cx="'+r1((sx+ex)/2 + g*2)+'" cy="'+r1((sy+ey)/2 - 5)+'" rx="'+r1(AU*1.02)+
-                       '" ry="'+r1(AU*0.8)+'" fill="'+lite+'" opacity="'+r1(.42+.4*d.arms)+'"/>';
+                       '" ry="'+r1(AU*0.8)+'" fill="'+lite+'" opacity="'+r1(cl01((.42+.4*d.arms)*defn))+'"/>';
     if (L.pose === 'flex' || L.pose === 'back'){
       ex = r1(cx + g*(SD + 11)); ey = ySh + 3;
       hx = r1(cx + g*(SD - 5));  hy = ySh - 30;
@@ -6687,18 +6747,39 @@ function mmFigure(look, dev, opt){
     out += '<path d="M'+sx+' '+sy+'L'+ex+' '+ey+'" stroke="'+SKF+'" stroke-width="'+r1(AU*2)+'" stroke-linecap="round" fill="none"/>' + bulge +
            '<path d="M'+ex+' '+ey+'L'+hx+' '+hy+'" stroke="'+SKF+'" stroke-width="'+r1(AF*2)+'" stroke-linecap="round" fill="none"/>' +
            '<path d="M'+r1(sx + g*AU*0.55)+' '+(sy+4)+'L'+r1(ex + g*AU*0.4)+' '+(ey-3)+
-             '" stroke="'+shade+'" stroke-width="'+r1(1.1+1.7*d.arms)+'" stroke-linecap="round" opacity=".7"/>' +
+             '" stroke="'+shade+'" stroke-width="'+r1((1.1+1.7*d.arms)*defn)+'" stroke-linecap="round" opacity=".7"/>' +
            '<path d="M'+r1(ex - g*AF*0.3)+' '+r1(ey + (hy-ey)*0.2)+'L'+r1(hx - g*AF*0.2)+' '+r1(hy - (hy-ey)*0.22)+
              '" stroke="'+shade+'" stroke-width="'+r1(0.8+1.2*d.arms)+'" stroke-linecap="round" opacity=".55"/>' +
            '<circle cx="'+ex+'" cy="'+ey+'" r="'+r1(AF*0.72)+'" fill="'+lite+'" opacity=".28"/>';
-    if ((L.tattoo === 'sleeve' || L.tattoo === 'both' || L.tattoo === 'full') && g === 1)
-      out += '<path d="M'+sx+' '+sy+'L'+ex+' '+ey+'" stroke="'+ink+'" stroke-width="'+r1(AU*1.55)+
-             '" fill="none" opacity=".44" stroke-dasharray="'+r1(AU*0.72)+' '+r1(AU*0.52)+'"/>' +
-             '<path d="M'+ex+' '+ey+'L'+hx+' '+hy+'" stroke="'+ink+'" stroke-width="'+r1(AF*1.5)+
-             '" fill="none" opacity=".38" stroke-dasharray="'+r1(AF*0.5)+' '+r1(AF*0.85)+'"/>';
+    if ((L.tattoo === 'sleeve' || L.tattoo === 'both' || L.tattoo === 'full') && g === 1){
+      /* A blackwork sleeve, masked to the arm itself. Banded dashes read as a
+         striped bandage; real blackwork is mostly solid ink with negative
+         space cut back out of it, and the mask means it can never spill. */
+      const am = id + 'a';
+      const mx = r1((ex + hx) / 2), my = r1((ey + hy) / 2);
+      out += '<mask id="'+am+'" maskUnits="userSpaceOnUse">' +
+        '<path d="M'+sx+' '+sy+'L'+ex+' '+ey+'" stroke="#fff" stroke-width="'+r1(AU*2)+'" stroke-linecap="round" fill="none"/>' +
+        '<path d="M'+ex+' '+ey+'L'+hx+' '+hy+'" stroke="#fff" stroke-width="'+r1(AF*2)+'" stroke-linecap="round" fill="none"/>' +
+        '</mask>' +
+        '<g mask="url(#'+am+')">' +
+          /* solid over the whole upper arm and the top half of the forearm */
+          '<path d="M'+sx+' '+sy+'L'+ex+' '+ey+'" stroke="'+ink+'" stroke-width="'+r1(AU*2)+'" opacity=".88" fill="none"/>' +
+          '<path d="M'+ex+' '+ey+'L'+mx+' '+my+'" stroke="'+ink+'" stroke-width="'+r1(AF*2)+'" opacity=".84" fill="none"/>' +
+          /* negative space: skin cut back through the ink in sweeping arcs */
+          '<path d="M'+r1(sx-AU*1.4)+' '+r1(sy+AU*0.7)+'Q'+r1((sx+ex)/2)+' '+r1((sy+ey)/2 - AU*0.5)+' '+r1(ex+AU*1.4)+' '+r1(ey+AU*0.5)+
+          '" stroke="'+sk+'" stroke-width="'+r1(AU*0.42)+'" fill="none" opacity=".92"/>' +
+          '<path d="M'+r1(sx-AU*1.4)+' '+r1(sy+AU*1.6)+'Q'+r1((sx+ex)/2)+' '+r1((sy+ey)/2 + AU*0.5)+' '+r1(ex+AU*1.4)+' '+r1(ey+AU*1.4)+
+          '" stroke="'+sk+'" stroke-width="'+r1(AU*0.3)+'" fill="none" opacity=".8"/>' +
+          '<path d="M'+r1(ex-AF*1.6)+' '+r1(ey+AF*1.2)+'Q'+mx+' '+r1(my-AF*0.4)+' '+r1(mx+AF*1.6)+' '+r1(my+AF*0.8)+
+          '" stroke="'+sk+'" stroke-width="'+r1(AF*0.34)+'" fill="none" opacity=".85"/>' +
+          /* the cuff, where the ink stops */
+          '<path d="M'+mx+' '+my+'L'+r1(mx + (hx-mx)*0.22)+' '+r1(my + (hy-my)*0.22)+
+          '" stroke="'+ink+'" stroke-width="'+r1(AF*2)+'" opacity=".5" fill="none"/>' +
+        '</g>';
+    }
     out += '<circle cx="'+sx+'" cy="'+sy+'" r="'+r1(DR)+'" fill="'+SKF+'"/>' +
            '<path d="M'+r1(sx - g*DR*0.75)+' '+r1(sy-DR*0.3)+'A'+r1(DR)+' '+r1(DR)+' 0 0 '+(g>0?1:0)+' '+r1(sx + g*DR*0.2)+' '+r1(sy+DR*0.85)+
-             '" stroke="'+shade+'" stroke-width="'+r1(1.2+1.6*d.delts)+'" fill="none" stroke-linecap="round" opacity=".8"/>' +
+             '" stroke="'+shade+'" stroke-width="'+r1((1.2+1.6*d.delts)*defn)+'" fill="none" stroke-linecap="round" opacity=".8"/>' +
            '<path d="M'+r1(sx - g*DR*0.2)+' '+r1(sy-DR*0.8)+'A'+r1(DR*0.9)+' '+r1(DR*0.9)+' 0 0 '+(g>0?1:0)+' '+r1(sx + g*DR*0.6)+' '+r1(sy+DR*0.3)+
              '" stroke="'+shade+'" stroke-width="'+r1(0.8+1*d.delts)+'" fill="none" stroke-linecap="round" opacity=".45"/>' +
            '<ellipse cx="'+r1(sx + g*DR*0.18)+'" cy="'+r1(sy-DR*0.42)+'" rx="'+r1(DR*0.55)+'" ry="'+r1(DR*0.36)+
