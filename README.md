@@ -24,11 +24,13 @@ Ten levels, Untrained through Monster. A week of honest training is about a leve
 The Development list shows each region against where it stood thirty days ago, so you can see where you are actually
 growing and where you are only busy.
 
-He runs a full posing round on a loop — waves you in, front double biceps, abs and thighs, rear double biceps,
-most muscular, then stands back down. He does it on the home page, in the sidebar, and on the way in.
+He runs a full posing round on a loop — waves you in, front double biceps, abs and thighs,
+side triceps turning into side chest, rear double biceps, most muscular, then stands back down. He does it on
+the home page, in the sidebar, and on the way in.
 
 Cosmetics: 14 hair styles and 10 colours, skin, beard, brow, gear (belt, wraps, shades, cap, chain), trunks,
-ink (arm sleeve, chest piece, or fully inked), and seven poses to hold when he is standing still.
+nine ink options — upper-arm band, half sleeve, full sleeve, chest piece, sleeve + chest, back piece, leg
+bands, or fully blacked out — and nine poses to hold when he is standing still.
 
 ## Eight coaches
 
