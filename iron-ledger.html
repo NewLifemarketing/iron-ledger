@@ -5066,7 +5066,7 @@ const MODELS = [
   { id:'claude-haiku-4-5', n:'Haiku 4.5', d:'Cheapest. Fine for straightforward questions' }
 ];
 let CFG = { coach:'off', anthropicKey:'', model:'claude-opus-5', supaUrl:'', supaAnon:'',
-            coachId:'sarge', coachNames:{} };
+            coachId:'heavy', coachNames:{} };
 function loadCfg(){
   try {
     const raw = localStorage.getItem(CFG_KEY);
@@ -5760,7 +5760,10 @@ const COACH_SYSTEM =
   'Answer using the numbers in their context block — cite their actual sets, lifts and macros rather than generalities. ' +
   'Be direct and concrete: give the number, the change to make, and why. Keep it under 200 words unless asked for more. ' +
   'They train 2 sets of 6-8 reps per exercise on a 6-day push/pull/legs split, so tailor advice to that. ' +
-  'You are not a doctor: for pain, injury, medication or bloodwork, say plainly that they need a professional.';
+  'You are not a doctor: for pain, injury, medication or bloodwork, say plainly that they need a professional. ' +
+  'You coach training, food and recovery only. You do not give doses, cycles, protocols or sourcing for ' +
+  'anabolic steroids or any other performance-enhancing drug, whatever the coach persona is called or ' +
+  'nicknamed — say that is a conversation for a doctor and answer the training side of the question instead.';
 
 /* ------------------------------------------------------------
    Coaches — eight archetypes, each a real school of thought
@@ -5833,26 +5836,25 @@ const COACHES = [
       'guilt, meal timing and supplements, and you will tell someone their programme is overcomplicated ' +
       'in about six words. You still insist on hard sets actually taken to failure.' },
 
-  { id:'hit', name:'The Rationalist', tag:'Brief, intense, infrequent',
-    infl:'Mike Mentzer', blurb:'One set that counts beats twenty that do not.',
+  { id:'trenm', name:'The Bench Brother', tag:'Heavy pressing, huge food',
+    infl:'Michael, Tren Twins', blurb:'Bench goes up, food goes in, questions later.',
     accent:'#4a3aa7',
-    look:{ skin:'#e8b48c', hair:'short', hairCol:'#3b2f2a', beard:'stache', acc:'none', brow:'calm' },
-    prompt:'You coach in the tradition Mike Mentzer made famous: high-intensity training, argued from ' +
-      'first principles. Very low volume, taken to genuine momentary muscular failure, with long ' +
-      'recovery between sessions — often four to seven days per body part. You reason out loud and ' +
-      'expect them to follow the logic rather than take it on faith. You are precise, a little ' +
-      'professorial, and you consider most training volume actively counterproductive.' },
+    look:{ skin:'#e8b48c', hair:'short', hairCol:'#3b2f2a', beard:'stubble', acc:'none', brow:'hard' },
+    prompt:'You coach in the style the Tren Twins made popular on YouTube, Michael\'s side of it: pressing ' +
+      'is the centrepiece and the bench number is the scoreboard. Heavy compound work, plenty of it, and ' +
+      'an enormous surplus to back it — you assume they are undereating until proven otherwise and you ' +
+      'will put real numbers on the food. Loud, young, encouraging, allergic to overthinking; you cut off ' +
+      'debates about optimal set ranges with "add weight and eat more". Simple progressive overload.' },
 
-  { id:'classic', name:'The Classicist', tag:'Classic physique',
-    infl:'Chris Bumstead', blurb:'Lines, waist and conditioning over raw size.',
-    accent:'#199e70',
-    look:{ skin:'#e0a878', hair:'slick', hairCol:'#6b4423', beard:'full', acc:'none', brow:'calm' },
-    prompt:'You coach in the tradition Chris Bumstead made famous: the classic physique. Shoulders, ' +
-      'a small waist, full legs and conditioning that holds — you judge everything by the outline. ' +
-      'You will happily tell someone to stop adding weight to a lift that is thickening their midsection, ' +
-      'and you bring up posing practice and structured off-seasons. Calm, modern and evidence-aware, ' +
-      'without being a slave to the numbers.' },
-
+  { id:'trenc', name:'The Every Day Twin', tag:'Frequency and arms',
+    infl:'Christian, Tren Twins', blurb:'In the gym more days than not, arms every time.',
+    accent:'#8b1f8b',
+    look:{ skin:'#e0a878', hair:'short', hairCol:'#2b2118', beard:'none', acc:'none', brow:'calm' },
+    prompt:'You coach in the style the Tren Twins made popular on YouTube, Christian\'s side of it: high ' +
+      'frequency above all. In the gym most days, long sessions, and arms and delts touched almost every ' +
+      'time rather than once a week. You are the hype man — you would rather they trained six days ' +
+      'imperfectly than three days perfectly, and you treat the habit as the whole game. Protein at every ' +
+      'meal, eat more, keep showing up. You are relaxed about soreness and firm about not missing days.' },
   { id:'grit', name:'The Grinder', tag:'Discipline and mental work',
     infl:'David Goggins', blurb:'The session you least want to do is the one that counts.',
     accent:'#6b7885',
@@ -7299,13 +7301,16 @@ function hairTop(L, hc, cx, yCrown, headCy, R){
    The coaches, as bodies — eight different men
    ============================================================ */
 const COACH_BODY = {
-  heavy:     { tat:'sleeve', dev:{ delts:.96, chest:.97, back:.95, traps:.94, arms:.97, abs:.34, legs:.95, calves:.80 }, pose:'flex'    },
-  precise:   { dev:{ delts:.88, chest:.90, back:.86, traps:.70, arms:.86, abs:.62, legs:.88, calves:.72 }, pose:'relaxed' },
+  /* Builds tuned to each man's documented, widely-known physique signature —
+     Platz's legs, Priest's arms on a short frame, Goggins's endurance build.
+     Public record about how someone trained and what it built; no faces. */
+  heavy:     { tat:'sleeve', dev:{ delts:.96, chest:.96, back:.99, traps:.95, arms:.97, abs:.34, legs:.96, calves:.82 }, pose:'back'  },
+  precise:   { dev:{ delts:.90, chest:.92, back:.92, traps:.80, arms:.88, abs:.52, legs:.94, calves:.74 }, pose:'relaxed' },
   legs:      { dev:{ delts:.70, chest:.66, back:.72, traps:.52, arms:.66, abs:.70, legs:.99, calves:.90 }, pose:'sidechest' },
   intuitive: { tat:'band', dev:{ delts:.90, chest:.82, back:.84, traps:.58, arms:.84, abs:.74, legs:.72, calves:.66 }, pose:'lat'    },
-  oldschool: { tat:'half', dev:{ delts:.84, chest:.80, back:.78, traps:.66, arms:.99, abs:.44, legs:.82, calves:.74 }, pose:'most'   },
-  hit:       { dev:{ delts:.76, chest:.78, back:.80, traps:.60, arms:.82, abs:.66, legs:.76, calves:.62 }, pose:'back'    },
-  classic:   { dev:{ delts:.92, chest:.80, back:.82, traps:.30, arms:.78, abs:.92, legs:.74, calves:.80 }, pose:'lat'     },
+  oldschool: { tat:'half', dev:{ delts:.88, chest:.82, back:.78, traps:.64, arms:1, abs:.46, legs:.84, calves:.78 }, pose:'sidetri' },
+  trenm:     { dev:{ delts:.88, chest:.94, back:.82, traps:.76, arms:.90, abs:.54, legs:.80, calves:.62 }, pose:'flex'    },
+  trenc:     { tat:'band', dev:{ delts:.90, chest:.84, back:.80, traps:.70, arms:.96, abs:.70, legs:.76, calves:.66 }, pose:'most'   },
   grit:      { tat:'full', dev:{ delts:.62, chest:.58, back:.66, traps:.44, arms:.60, abs:.98, legs:.70, calves:.86 }, pose:'abs'    }
 };
 function coachLook(c, pose){

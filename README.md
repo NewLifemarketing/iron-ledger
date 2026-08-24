@@ -36,9 +36,10 @@ bands, or fully blacked out — and nine poses to hold when he is standing still
 
 **Coach** picks between eight schools of training, each credited to the lifter who made it famous:
 Coleman-style volume, Cutler-style precision, Platz-style leg work, Levrone-style intuition,
-Priest-style bluntness, Mentzer-style HIT, Bumstead-style classic physique, and Goggins-style
-discipline. They are original coaching characters, not those men speaking — the credit is for the
-method, and each prompt says so if asked. Renaming any of them is one tap.
+Priest-style bluntness, the two Tren Twins approaches, and Goggins-style discipline. They are
+original coaching characters, not those men speaking — the credit is for the method, the builds are
+tuned to each one's documented physique, and no likeness is used. Each prompt says so if asked, and
+none of them will discuss drug protocols.
 
 Switching it on is one field on the Coach tab: paste an Anthropic API key, pick a model, done.
 There is no separate setup screen and no key in this repository.
