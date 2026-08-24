@@ -34,10 +34,14 @@ bands, or fully blacked out — and nine poses to hold when he is standing still
 
 ## Eight coaches
 
-**Coach → Your coach** picks between eight archetypes — drill sergeant, golden-era aesthetics, evidence-based,
-90s mass, technique-first, powerbuilding, contest prep, and comebacks. They are characters rather than real people,
-and each carries its own instructions, so the advice genuinely changes when you switch. Rename any of them to
-whatever you like; the instructions behind the name stay put.
+**Coach** picks between eight schools of training, each credited to the lifter who made it famous:
+Coleman-style volume, Cutler-style precision, Platz-style leg work, Levrone-style intuition,
+Priest-style bluntness, Mentzer-style HIT, Bumstead-style classic physique, and Goggins-style
+discipline. They are original coaching characters, not those men speaking — the credit is for the
+method, and each prompt says so if asked. Renaming any of them is one tap.
+
+Switching it on is one field on the Coach tab: paste an Anthropic API key, pick a model, done.
+There is no separate setup screen and no key in this repository.
 
 ## Put it online (GitHub Pages)
 

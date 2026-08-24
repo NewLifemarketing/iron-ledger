@@ -763,6 +763,7 @@ main{ flex:1 1 auto; min-width:0; padding-bottom:calc(var(--tab-h) + env(safe-ar
   font-family:var(--f-disp); font-weight:700; font-size:9px; letter-spacing:.11em;
   text-transform:uppercase; color:var(--ca);
 }
+.ccard .ci{ font-size:9.5px; color:var(--ink-3); margin-top:2px; font-style:italic; }
 .ccard .cb{ font-size:11px; line-height:1.35; color:var(--ink-3); margin-top:3px; }
 .ccard .cmark{
   position:absolute; top:8px; right:8px; width:19px; height:19px; border-radius:50%;
@@ -2229,7 +2230,6 @@ const TABS = [
   { k:'food',     n:'Food',     icon:'food',     bar:true },
   { k:'goals',    n:'Goals',    icon:'goals',    bar:true },
   { k:'coach',    n:'Coach',    icon:'chat',     bar:true },
-  { k:'setup',    n:'Coach setup', icon:'settings', bar:false },
   { k:'history',  n:'History',  icon:'history',  bar:false },
   { k:'profile',  n:'Profile',  icon:'profile',  bar:false },
   { k:'character',n:'Character',icon:'body',     bar:false }
@@ -5767,70 +5767,102 @@ const COACH_SYSTEM =
    rather than a real person. The prompt is what makes them
    differ; the avatar is drawn from the `look` parameters.
 ------------------------------------------------------------ */
+/* ------------------------------------------------------------
+   The roster: eight schools of training, each named for the
+   lifter who made it famous.
+
+   `infl` is a factual credit — Tom Platz really did build his
+   legs on high-rep squats, Mentzer really did argue for brief
+   infrequent training. What these are NOT is those men talking:
+   each one is an original coaching character trained on the
+   documented method, the avatars are drawn from parameters
+   rather than anyone's face, and every prompt is told to say so
+   if asked. Putting diet and training words in a living
+   person's mouth is the line, and this stays on the near side
+   of it. Rename any of them in the app if you want your own
+   labels.
+------------------------------------------------------------ */
 const COACHES = [
-  { id:'sarge', name:'Sergeant Steel', tag:'Old-school discipline',
-    blurb:'Heavy compounds, straight sets, zero excuses.',
+  { id:'heavy', name:'The Heavy Hitter', tag:'Volume and heavy weight',
+    infl:'Ronnie Coleman', blurb:'Big weight for real reps, and a lot of them.',
     accent:'#c8102e',
-    look:{ skin:'#d99b6c', hair:'buzz', hairCol:'#2b2118', beard:'stubble', acc:'none', brow:'hard' },
-    prompt:'You are an old-school drill-sergeant coach. Compounds first, straight sets, no gimmicks. ' +
-      'Blunt, clipped sentences. You care about showing up and adding weight to the bar. You are ' +
-      'sceptical of fancy techniques and tell them to eat more and sleep more before anything else.' },
+    look:{ skin:'#8d5228', hair:'bald', hairCol:'#141414', beard:'goatee', acc:'none', brow:'hard' },
+    prompt:'You coach in the tradition Ronnie Coleman made famous: high volume AND heavy weight, ' +
+      'not one or the other. Free weights first, full range, and you expect them to work up to a ' +
+      'genuinely heavy set on the main lift every session. You are warm and loud rather than cruel, ' +
+      'you love a big number, and you are unimpressed by anyone using machines to avoid effort. ' +
+      'You will tell them to eat far more than they think they need to move that kind of weight.' },
 
-  { id:'architect', name:'The Architect', tag:'Golden-era aesthetics',
-    blurb:'Symmetry, taper, proportion over raw size.',
+  { id:'precise', name:'The Professional', tag:'Precision and consistency',
+    infl:'Jay Cutler', blurb:'Nothing wasted, nothing skipped, year after year.',
+    accent:'#0057b8',
+    look:{ skin:'#d99b6c', hair:'short', hairCol:'#2b2118', beard:'stubble', acc:'none', brow:'calm' },
+    prompt:'You coach in the tradition Jay Cutler made famous: professional consistency over heroics. ' +
+      'Moderate weight moved with perfect control, every session logged, every meal on time, and no ' +
+      'ego lifting because an injury costs a year. You care about weak points and bringing lagging ' +
+      'areas up to match the rest. Measured, businesslike, encouraging. You would rather they hit ' +
+      'the same plan for twelve months than chase a new one every six weeks.' },
+
+  { id:'legs', name:'The Leg Specialist', tag:'High-rep squatting',
+    infl:'Tom Platz', blurb:'Squats past the point where it stops being fun.',
     accent:'#c9922f',
-    look:{ skin:'#e0a878', hair:'flattop', hairCol:'#6b4423', beard:'none', acc:'none', brow:'calm' },
-    prompt:'You are a golden-era physique coach. You judge everything by shape: shoulder-to-waist ratio, ' +
-      'a tight midsection, full delts, the illusion of taper. You will happily tell them to stop chasing ' +
-      'numbers on a lift that is ruining their lines, and you bring up posing practice.' },
+    look:{ skin:'#e8b48c', hair:'long', hairCol:'#c19a5b', beard:'none', acc:'headband', brow:'hard' },
+    prompt:'You coach in the tradition Tom Platz made famous: legs built on very high-rep squatting ' +
+      'and a tolerance for discomfort most people never develop. Twenty, thirty, fifty reps at a ' +
+      'weight that has no business going that far. You believe the set only starts when it begins to ' +
+      'hurt, and you talk about breathing, bracing and depth constantly. You are intense and a little ' +
+      'poetic about pain, but you never tell them to train through joint pain or injury.' },
 
-  { id:'doc', name:'Doctor Volume', tag:'Evidence-based',
-    blurb:'Sets, RIR and progression, argued from mechanism.',
-    accent:'#2a78d6',
-    look:{ skin:'#c98a5e', hair:'curly', hairCol:'#1d1a17', beard:'goatee', acc:'shades', brow:'calm' },
-    prompt:'You are an evidence-based hypertrophy coach. You reason from mechanical tension, effective reps, ' +
-      'stimulus-to-fatigue ratio and weekly set landmarks. You quantify: name the set count, the RIR, the ' +
-      'rate of progression. You flag when the evidence is thin rather than overclaiming.' },
-
-  { id:'monster', name:'Mass Monster', tag:'90s intensity',
-    blurb:'Fewer sets, taken somewhere most people will not go.',
-    accent:'#8b1f8b',
-    look:{ skin:'#b87850', hair:'bald', hairCol:'#000', beard:'full', acc:'none', brow:'hard' },
-    prompt:'You are a 1990s mass-era coach. Low set counts taken to genuine failure, heavy negatives, ' +
-      'forced reps, then out of the gym. You believe effort beats arithmetic and say so. You are ' +
-      'suspicious of anyone doing twenty sets a muscle and will tell them they are not training hard enough.' },
-
-  { id:'tech', name:'The Technician', tag:'Form and longevity',
-    blurb:'Tempo, range, joints that still work at fifty.',
+  { id:'intuitive', name:'The Comeback', tag:'Intuitive, low frequency',
+    infl:'Kevin Levrone', blurb:'Less time in the gym than anyone expects.',
     accent:'#1baf7a',
-    look:{ skin:'#f0c9a0', hair:'ponytail', hairCol:'#3b2f2a', beard:'none', acc:'none', brow:'calm' },
-    prompt:'You are a technique-first coach. Every answer looks at execution before load: tempo, full range, ' +
-      'stretch under tension, stable setup. You favour machines and cables where they load the muscle better, ' +
-      'and you plan for a lifter who wants working joints in twenty years.' },
+    look:{ skin:'#c98a5e', hair:'flattop', hairCol:'#141414', beard:'none', acc:'shades', brow:'calm' },
+    prompt:'You coach in the tradition Kevin Levrone made famous: train by feel, train less often than ' +
+      'the internet says, and come back from long layoffs without panic. You are relaxed about missed ' +
+      'sessions and sceptical of rigid programmes. You ask how they feel before you ask what the plan ' +
+      'said, and you would rather they did four hard sessions they wanted to do than six they dragged ' +
+      'themselves through. You point out that muscle memory is real and time off is not a disaster.' },
 
-  { id:'iron', name:'Coach Iron Will', tag:'Powerbuilding',
-    blurb:'Get strong, let the size follow.',
-    accent:'#4a3aa7',
-    look:{ skin:'#e8b48c', hair:'mullet', hairCol:'#8a5a2b', beard:'stache', acc:'headband', brow:'hard' },
-    prompt:'You are a powerbuilding coach. Strength on the main lifts is the engine; hypertrophy work supports it. ' +
-      'You talk in estimated 1RM, top sets, back-off sets and peaking blocks, and you will restructure their ' +
-      'week around the two or three lifts that actually matter.' },
-
-  { id:'shred', name:'The Conditioner', tag:'Contest prep',
-    blurb:'Conditioning, water, and holding muscle on a deficit.',
+  { id:'oldschool', name:'The Blunt Instrument', tag:'Old-school, no fuss',
+    infl:'Lee Priest', blurb:'Train hard, eat what you like, stop overthinking.',
     accent:'#d95926',
-    look:{ skin:'#a9663d', hair:'long', hairCol:'#141414', beard:'none', acc:'none', brow:'calm' },
-    prompt:'You are a contest-prep coach. You think in weekly rate of loss, protein per pound, refeeds, step ' +
-      'counts and how much muscle a deficit is costing them. You are strict about the numbers and honest when ' +
-      'their deficit is too aggressive to hold size.' },
+    look:{ skin:'#f4d0aa', hair:'buzz', hairCol:'#8a5a2b', beard:'none', acc:'none', brow:'hard' },
+    prompt:'You coach in the tradition Lee Priest made famous: blunt, old-school, and openly ' +
+      'contemptuous of fussiness. High volume, especially on arms. Eat what you like as long as the ' +
+      'training is hard and the weight is going the right way. You are funny and rude about food ' +
+      'guilt, meal timing and supplements, and you will tell someone their programme is overcomplicated ' +
+      'in about six words. You still insist on hard sets actually taken to failure.' },
 
-  { id:'vet', name:'The Veteran', tag:'Comebacks and bad joints',
-    blurb:'Training around what hurts, and coming back from layoffs.',
+  { id:'hit', name:'The Rationalist', tag:'Brief, intense, infrequent',
+    infl:'Mike Mentzer', blurb:'One set that counts beats twenty that do not.',
+    accent:'#4a3aa7',
+    look:{ skin:'#e8b48c', hair:'short', hairCol:'#3b2f2a', beard:'stache', acc:'none', brow:'calm' },
+    prompt:'You coach in the tradition Mike Mentzer made famous: high-intensity training, argued from ' +
+      'first principles. Very low volume, taken to genuine momentary muscular failure, with long ' +
+      'recovery between sessions — often four to seven days per body part. You reason out loud and ' +
+      'expect them to follow the logic rather than take it on faith. You are precise, a little ' +
+      'professorial, and you consider most training volume actively counterproductive.' },
+
+  { id:'classic', name:'The Classicist', tag:'Classic physique',
+    infl:'Chris Bumstead', blurb:'Lines, waist and conditioning over raw size.',
+    accent:'#199e70',
+    look:{ skin:'#e0a878', hair:'slick', hairCol:'#6b4423', beard:'full', acc:'none', brow:'calm' },
+    prompt:'You coach in the tradition Chris Bumstead made famous: the classic physique. Shoulders, ' +
+      'a small waist, full legs and conditioning that holds — you judge everything by the outline. ' +
+      'You will happily tell someone to stop adding weight to a lift that is thickening their midsection, ' +
+      'and you bring up posing practice and structured off-seasons. Calm, modern and evidence-aware, ' +
+      'without being a slave to the numbers.' },
+
+  { id:'grit', name:'The Grinder', tag:'Discipline and mental work',
+    infl:'David Goggins', blurb:'The session you least want to do is the one that counts.',
     accent:'#6b7885',
-    look:{ skin:'#c98a5e', hair:'buzz', hairCol:'#9aa8b4', beard:'goatee', acc:'none', brow:'calm' },
-    prompt:'You are a veteran coach who has trained through injuries and long layoffs. You are unbothered by ' +
-      'time off and good at substitutions: swap the movement, keep the stimulus. You ask what hurts and work ' +
-      'around it, and you are quick to say when something needs a doctor or physio rather than a workaround.' }
+    look:{ skin:'#61401f', hair:'buzz', hairCol:'#141414', beard:'stubble', acc:'none', brow:'hard' },
+    prompt:'You coach in the tradition David Goggins made famous: discipline over motivation, and the ' +
+      'work you least want to do is the work that matters. You are not a hypertrophy specialist — you ' +
+      'push consistency, conditioning, and the willingness to do the session anyway. You call out ' +
+      'excuses directly and without insult, you care about what they do on the bad days, and you add ' +
+      'cardio and step counts that a pure bodybuilding coach would leave out. You never encourage ' +
+      'training through injury — you separate discomfort from damage explicitly.' }
 ];
 const coachById = id => COACHES.find(c => c.id === id) || COACHES[0];
 const activeCoach = () => coachById(CFG.coachId);
@@ -6094,11 +6126,34 @@ VIEWS.coach = function(){
   '<div class="panel pad tiny muted">' +
     (live
       ? 'Answers use your logged numbers — this week\'s sets, your lifts, your macros and your split.'
-      : 'The coach is switched off, so a question gets packaged up with your numbers for you to paste ' +
-        'into Claude yourself. <button class="sec-link" data-act="go" data-v="setup">Switch it on</button> ' +
-        'with an API key and the answers appear here instead. The key stays in this browser.') +
+      : 'Not switched on yet — a question gets packaged up with your numbers for you to paste into ' +
+        'Claude yourself. Add a key below and the answers appear here instead.') +
   '</div>';
 
+
+  /* Switching the coach on used to mean visiting a separate setup screen. It
+     is one field, so it lives here instead and disappears once it is set. */
+  if (!live) out +=
+    '<div class="panel pad stack-sm" style="border-color:var(--acc)">' +
+      '<div class="eyebrow" style="color:var(--acc-hi)">Turn the coach on</div>' +
+      '<div class="tiny muted">Paste an Anthropic API key from ' +
+        '<b>console.anthropic.com &rarr; API keys</b>. It is stored in this browser only — never in the ' +
+        'page, never in the repository, never sent anywhere but Anthropic.</div>' +
+      '<div class="field"><label>API key</label>' +
+        '<input class="inp" id="ckey" type="password" autocomplete="off" spellcheck="false" ' +
+          'placeholder="sk-ant-..." value="' + esc(CFG.anthropicKey || '') + '"></div>' +
+      '<div class="field"><label>Model</label><select class="inp" id="cmodel">' +
+        MODELS.map(m => '<option value="' + m.id + '"' + (CFG.model === m.id ? ' selected' : '') + '>' +
+          esc(m.n) + ' — ' + esc(m.d) + '</option>').join('') + '</select></div>' +
+      '<button class="btn btn-pri btn-block" data-act="coachOn">Use this key</button>' +
+      (coachTestMsg ? '<div class="tiny ' + (coachTestOk ? 'muted' : 'hot') + '">' + esc(coachTestMsg) + '</div>' : '') +
+    '</div>';
+  else out +=
+    '<div class="between panel pad tiny muted">' +
+      '<span>Answering with <b>' + esc((MODELS.find(m => m.id === CFG.model) || MODELS[0]).n) + '</b>' +
+        (CFG.coach === 'proxy' ? ' through your own server' : ', key held in this browser') + '</span>' +
+      '<button class="sec-link" data-act="coachOff">Turn off</button>' +
+    '</div>';
   out += coachRoster();
 
   if (chat.length){
@@ -6131,6 +6186,29 @@ VIEWS.coach = function(){
   out += '<div class="panel pad mini muted">General training and nutrition guidance, not medical advice. ' +
     'For pain, injury, medication or bloodwork, talk to a doctor or physio.</div>';
   return out;
+};
+let coachTestMsg = '', coachTestOk = null;
+ACTS.coachOn = async (el) => {
+  const k = (document.getElementById('ckey') || {}).value || '';
+  const m = (document.getElementById('cmodel') || {}).value || MODELS[0].id;
+  if (!k.trim()){ coachTestMsg = 'Paste a key first.'; coachTestOk = false; render(); return; }
+  const savedKey = CFG.anthropicKey, savedModel = CFG.model, savedMode = CFG.coach;
+  CFG.anthropicKey = k.trim(); CFG.model = m; CFG.coach = 'direct';
+  el.disabled = true; coachTestMsg = 'Checking the key…'; coachTestOk = null; render();
+  try {
+    /* one real call, so a bad key or a blocked origin is caught here rather
+       than looking like a broken coach on the first question */
+    await askDirect('Reply with the single word: ready', []);
+    saveCfg(); coachTestMsg = ''; coachTestOk = true;
+    toast('Coach is live'); render();
+  } catch(e){
+    CFG.anthropicKey = savedKey; CFG.model = savedModel; CFG.coach = savedMode;
+    coachTestMsg = sandboxHint(e.message); coachTestOk = false; render();
+  }
+};
+ACTS.coachOff = () => {
+  CFG.coach = 'off'; CFG.anthropicKey = ''; saveCfg();
+  coachTestMsg = ''; coachTestOk = null; toast('Coach switched off'); render();
 };
 ACTS.chatSend = () => {
   const el = document.getElementById('chatIn');
@@ -7221,14 +7299,14 @@ function hairTop(L, hc, cx, yCrown, headCy, R){
    The coaches, as bodies — eight different men
    ============================================================ */
 const COACH_BODY = {
-  sarge:     { tat:'sleeve', dev:{ delts:.72, chest:.80, back:.66, traps:.88, arms:.70, abs:.42, legs:.78, calves:.60 }, pose:'cross'   },
-  architect: { dev:{ delts:.88, chest:.74, back:.72, traps:.32, arms:.68, abs:.84, legs:.58, calves:.72 }, pose:'lat'     },
-  doc:       { dev:{ delts:.62, chest:.60, back:.64, traps:.48, arms:.62, abs:.66, legs:.70, calves:.58 }, pose:'relaxed' },
-  monster:   { tat:'full', dev:{ delts:.97, chest:.98, back:.95, traps:.94, arms:.99, abs:.28, legs:.92, calves:.78 }, pose:'flex'    },
-  tech:      { dev:{ delts:.56, chest:.54, back:.68, traps:.38, arms:.54, abs:.76, legs:.66, calves:.64 }, pose:'relaxed' },
-  iron:      { dev:{ delts:.78, chest:.86, back:.90, traps:.92, arms:.80, abs:.32, legs:.96, calves:.66 }, pose:'lat'     },
-  shred:     { tat:'chest', dev:{ delts:.70, chest:.58, back:.62, traps:.42, arms:.64, abs:.99, legs:.62, calves:.88 }, pose:'flex'    },
-  vet:       { tat:'sleeve', dev:{ delts:.58, chest:.66, back:.56, traps:.62, arms:.58, abs:.36, legs:.52, calves:.48 }, pose:'relaxed' }
+  heavy:     { tat:'sleeve', dev:{ delts:.96, chest:.97, back:.95, traps:.94, arms:.97, abs:.34, legs:.95, calves:.80 }, pose:'flex'    },
+  precise:   { dev:{ delts:.88, chest:.90, back:.86, traps:.70, arms:.86, abs:.62, legs:.88, calves:.72 }, pose:'relaxed' },
+  legs:      { dev:{ delts:.70, chest:.66, back:.72, traps:.52, arms:.66, abs:.70, legs:.99, calves:.90 }, pose:'sidechest' },
+  intuitive: { tat:'band', dev:{ delts:.90, chest:.82, back:.84, traps:.58, arms:.84, abs:.74, legs:.72, calves:.66 }, pose:'lat'    },
+  oldschool: { tat:'half', dev:{ delts:.84, chest:.80, back:.78, traps:.66, arms:.99, abs:.44, legs:.82, calves:.74 }, pose:'most'   },
+  hit:       { dev:{ delts:.76, chest:.78, back:.80, traps:.60, arms:.82, abs:.66, legs:.76, calves:.62 }, pose:'back'    },
+  classic:   { dev:{ delts:.92, chest:.80, back:.82, traps:.30, arms:.78, abs:.92, legs:.74, calves:.80 }, pose:'lat'     },
+  grit:      { tat:'full', dev:{ delts:.62, chest:.58, back:.66, traps:.44, arms:.60, abs:.98, legs:.70, calves:.86 }, pose:'abs'    }
 };
 function coachLook(c, pose){
   const L = c.look;
@@ -7674,12 +7752,15 @@ function coachRoster(){
         '<span class="cfig">' + coachAvatar(c, 130) + '</span>' +
         '<span class="cn">' + esc(coachName(c)) + '</span>' +
         '<span class="ct">' + esc(c.tag) + '</span>' +
+        (c.infl ? '<span class="ci">in the tradition of ' + esc(c.infl) + '</span>' : '') +
         '<span class="cb">' + esc(c.blurb) + '</span>' +
         (on ? '<span class="cmark">' + I.check + '</span>' : '') +
       '</button>';
     }).join('') + '</div>' +
-    '<div class="panel pad mini muted">Eight coaching characters, not real people — each one is a different school of ' +
-      'thought with its own instructions, so the advice genuinely changes when you switch. Rename any of them to whatever you like.</div>';
+    '<div class="panel pad mini muted">Eight coaching characters modelled on eight documented schools of ' +
+      'training — the credit names who made each method famous, but these are original coaches, not those ' +
+      'men speaking. Each carries its own instructions, so the advice genuinely changes when you switch. ' +
+      'Rename any of them to whatever you like.</div>';
 }
 ACTS.coachPick = (el) => {
   CFG.coachId = el.dataset.v; saveCfg();
