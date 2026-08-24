@@ -763,7 +763,12 @@ main{ flex:1 1 auto; min-width:0; padding-bottom:calc(var(--tab-h) + env(safe-ar
   font-family:var(--f-disp); font-weight:700; font-size:9px; letter-spacing:.11em;
   text-transform:uppercase; color:var(--ca);
 }
-.ccard .ci{ font-size:9.5px; color:var(--ink-3); margin-top:2px; font-style:italic; }
+/* the surname behind the card — the credit, sized as decoration */
+.ccard .cwm{
+  position:absolute; inset:auto 0 24px 0; text-align:center; pointer-events:none;
+  font-family:var(--f-disp); font-weight:800; font-size:30px; letter-spacing:-.03em;
+  text-transform:uppercase; color:var(--ca); opacity:.14; white-space:nowrap; overflow:hidden;
+}
 .ccard .cb{ font-size:11px; line-height:1.35; color:var(--ink-3); margin-top:3px; }
 .ccard .cmark{
   position:absolute; top:8px; right:8px; width:19px; height:19px; border-radius:50%;
@@ -5786,8 +5791,8 @@ const COACH_SYSTEM =
    labels.
 ------------------------------------------------------------ */
 const COACHES = [
-  { id:'heavy', name:'The Heavy Hitter', tag:'Volume and heavy weight',
-    infl:'Ronnie Coleman', blurb:'Big weight for real reps, and a lot of them.',
+  { id:'heavy', name:'Ronnie Coleman', tag:'Volume and heavy weight',
+    blurb:'Big weight for real reps, and a lot of them.',
     accent:'#c8102e',
     look:{ skin:'#8d5228', hair:'bald', hairCol:'#141414', beard:'goatee', acc:'none', brow:'hard' },
     prompt:'You coach in the tradition Ronnie Coleman made famous: high volume AND heavy weight, ' +
@@ -5796,8 +5801,8 @@ const COACHES = [
       'you love a big number, and you are unimpressed by anyone using machines to avoid effort. ' +
       'You will tell them to eat far more than they think they need to move that kind of weight.' },
 
-  { id:'precise', name:'The Professional', tag:'Precision and consistency',
-    infl:'Jay Cutler', blurb:'Nothing wasted, nothing skipped, year after year.',
+  { id:'precise', name:'Jay Cutler', tag:'Precision and consistency',
+    blurb:'Nothing wasted, nothing skipped, year after year.',
     accent:'#0057b8',
     look:{ skin:'#d99b6c', hair:'short', hairCol:'#2b2118', beard:'stubble', acc:'none', brow:'calm' },
     prompt:'You coach in the tradition Jay Cutler made famous: professional consistency over heroics. ' +
@@ -5806,8 +5811,8 @@ const COACHES = [
       'areas up to match the rest. Measured, businesslike, encouraging. You would rather they hit ' +
       'the same plan for twelve months than chase a new one every six weeks.' },
 
-  { id:'legs', name:'The Leg Specialist', tag:'High-rep squatting',
-    infl:'Tom Platz', blurb:'Squats past the point where it stops being fun.',
+  { id:'legs', name:'Tom Platz', tag:'High-rep squatting',
+    blurb:'Squats past the point where it stops being fun.',
     accent:'#c9922f',
     look:{ skin:'#e8b48c', hair:'long', hairCol:'#c19a5b', beard:'none', acc:'headband', brow:'hard' },
     prompt:'You coach in the tradition Tom Platz made famous: legs built on very high-rep squatting ' +
@@ -5816,8 +5821,8 @@ const COACHES = [
       'hurt, and you talk about breathing, bracing and depth constantly. You are intense and a little ' +
       'poetic about pain, but you never tell them to train through joint pain or injury.' },
 
-  { id:'intuitive', name:'The Comeback', tag:'Intuitive, low frequency',
-    infl:'Kevin Levrone', blurb:'Less time in the gym than anyone expects.',
+  { id:'intuitive', name:'Kevin Levrone', tag:'Intuitive, low frequency',
+    blurb:'Less time in the gym than anyone expects.',
     accent:'#1baf7a',
     look:{ skin:'#c98a5e', hair:'flattop', hairCol:'#141414', beard:'none', acc:'shades', brow:'calm' },
     prompt:'You coach in the tradition Kevin Levrone made famous: train by feel, train less often than ' +
@@ -5826,8 +5831,8 @@ const COACHES = [
       'said, and you would rather they did four hard sessions they wanted to do than six they dragged ' +
       'themselves through. You point out that muscle memory is real and time off is not a disaster.' },
 
-  { id:'oldschool', name:'The Blunt Instrument', tag:'Old-school, no fuss',
-    infl:'Lee Priest', blurb:'Train hard, eat what you like, stop overthinking.',
+  { id:'oldschool', name:'Lee Priest', tag:'Old-school, no fuss',
+    blurb:'Train hard, eat what you like, stop overthinking.',
     accent:'#d95926',
     look:{ skin:'#f4d0aa', hair:'buzz', hairCol:'#8a5a2b', beard:'none', acc:'none', brow:'hard' },
     prompt:'You coach in the tradition Lee Priest made famous: blunt, old-school, and openly ' +
@@ -5836,8 +5841,8 @@ const COACHES = [
       'guilt, meal timing and supplements, and you will tell someone their programme is overcomplicated ' +
       'in about six words. You still insist on hard sets actually taken to failure.' },
 
-  { id:'trenm', name:'The Bench Brother', tag:'Heavy pressing, huge food',
-    infl:'Michael, Tren Twins', blurb:'Bench goes up, food goes in, questions later.',
+  { id:'trenm', name:'Mike Tren', tag:'Heavy pressing, huge food',
+    blurb:'Bench goes up, food goes in, questions later.',
     accent:'#4a3aa7',
     look:{ skin:'#e8b48c', hair:'short', hairCol:'#3b2f2a', beard:'stubble', acc:'none', brow:'hard' },
     prompt:'You coach in the style the Tren Twins made popular on YouTube, Michael\'s side of it: pressing ' +
@@ -5846,8 +5851,8 @@ const COACHES = [
       'will put real numbers on the food. Loud, young, encouraging, allergic to overthinking; you cut off ' +
       'debates about optimal set ranges with "add weight and eat more". Simple progressive overload.' },
 
-  { id:'trenc', name:'The Every Day Twin', tag:'Frequency and arms',
-    infl:'Christian, Tren Twins', blurb:'In the gym more days than not, arms every time.',
+  { id:'trenc', name:'Chris Tren', tag:'Frequency and arms',
+    blurb:'In the gym more days than not, arms every time.',
     accent:'#8b1f8b',
     look:{ skin:'#e0a878', hair:'short', hairCol:'#2b2118', beard:'none', acc:'none', brow:'calm' },
     prompt:'You coach in the style the Tren Twins made popular on YouTube, Christian\'s side of it: high ' +
@@ -5855,8 +5860,8 @@ const COACHES = [
       'time rather than once a week. You are the hype man — you would rather they trained six days ' +
       'imperfectly than three days perfectly, and you treat the habit as the whole game. Protein at every ' +
       'meal, eat more, keep showing up. You are relaxed about soreness and firm about not missing days.' },
-  { id:'grit', name:'The Grinder', tag:'Discipline and mental work',
-    infl:'David Goggins', blurb:'The session you least want to do is the one that counts.',
+  { id:'grit', name:'David Goggins', tag:'Discipline and mental work',
+    blurb:'The session you least want to do is the one that counts.',
     accent:'#6b7885',
     look:{ skin:'#61401f', hair:'buzz', hairCol:'#141414', beard:'stubble', acc:'none', brow:'hard' },
     prompt:'You coach in the tradition David Goggins made famous: discipline over motivation, and the ' +
@@ -5871,8 +5876,16 @@ const activeCoach = () => coachById(CFG.coachId);
 const coachName = c => (CFG.coachNames && CFG.coachNames[c.id]) || c.name;
 function systemFor(){
   const c = activeCoach();
-  return COACH_SYSTEM + '\n\nYour coaching persona: ' + coachName(c) + '. ' + c.prompt +
-    '\nStay in that voice. You are a coaching character, not a real person — if asked who you are, say so plainly.';
+  /* The preset is labelled with the lifter whose method it encodes. The model is
+     told plainly that it is not him: no first-person claim, no invented quotes.
+     Naming a training style after the man who made it famous is one thing;
+     speaking for him is another. */
+  return COACH_SYSTEM +
+    '\n\nYou are an original coach built on the documented training method of ' + c.name + '. ' +
+    c.prompt +
+    '\nStay in that voice. You are NOT ' + c.name + ' and must never claim to be, never speak as him ' +
+    'in the first person, and never invent quotes or opinions attributed to him. If asked who you are, ' +
+    'say you are a coach built on his training style, not the man himself.';
 }
 
 const COACH_PROMPTS = [
@@ -6422,6 +6435,11 @@ function boot(){
   signedIn = deviceTrusted();          /* trusted device: do not ask again */
   applyTheme();
   checkStorage();
+  /* Ask the browser not to evict this origin. Without it a browser is free to
+     clear localStorage under pressure or after a period of not visiting, which
+     is what makes an app like this ask you to set it up again out of nowhere. */
+  if (navigator.storage && navigator.storage.persist)
+    navigator.storage.persisted().then(ok => ok || navigator.storage.persist()).catch(() => {});
   render();
   maybeWelcome();
   if (cloudOn() && SESSION) cloudPull().then(row => {
@@ -7757,15 +7775,15 @@ function coachRoster(){
         '<span class="cfig">' + coachAvatar(c, 130) + '</span>' +
         '<span class="cn">' + esc(coachName(c)) + '</span>' +
         '<span class="ct">' + esc(c.tag) + '</span>' +
-        (c.infl ? '<span class="ci">in the tradition of ' + esc(c.infl) + '</span>' : '') +
+        '<span class="cwm" aria-hidden="true">' + esc(c.name.split(' ').pop()) + '</span>' +
         '<span class="cb">' + esc(c.blurb) + '</span>' +
         (on ? '<span class="cmark">' + I.check + '</span>' : '') +
       '</button>';
     }).join('') + '</div>' +
-    '<div class="panel pad mini muted">Eight coaching characters modelled on eight documented schools of ' +
-      'training — the credit names who made each method famous, but these are original coaches, not those ' +
-      'men speaking. Each carries its own instructions, so the advice genuinely changes when you switch. ' +
-      'Rename any of them to whatever you like.</div>';
+    '<div class="panel pad mini muted">Each preset is named for the lifter whose documented method it ' +
+      'encodes, and each carries its own instructions — so the advice genuinely changes when you switch. ' +
+      'They are coaches built on those methods, not those men: no likeness is used, none speaks in the ' +
+      'first person as him, and none will invent a quote. Rename any of them to whatever you like.</div>';
 }
 ACTS.coachPick = (el) => {
   CFG.coachId = el.dataset.v; saveCfg();
