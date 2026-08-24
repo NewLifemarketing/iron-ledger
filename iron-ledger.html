@@ -5061,10 +5061,11 @@ const SUPA = {
 ------------------------------------------------------------ */
 const CFG_KEY = 'ironledger.cfg';
 const MODELS = [
-  { id:'claude-sonnet-5', n:'Sonnet 5', d:'Fast, cheap, plenty for coaching' },
-  { id:'claude-opus-5',   n:'Opus 5',   d:'Deepest reasoning, costs more' }
+  { id:'claude-opus-5',   n:'Opus 5',   d:'Best answers. Pennies a question at this length.' },
+  { id:'claude-sonnet-5', n:'Sonnet 5', d:'Cheaper and quicker, still good for coaching' },
+  { id:'claude-haiku-4-5', n:'Haiku 4.5', d:'Cheapest. Fine for straightforward questions' }
 ];
-let CFG = { coach:'off', anthropicKey:'', model:'claude-sonnet-5', supaUrl:'', supaAnon:'',
+let CFG = { coach:'off', anthropicKey:'', model:'claude-opus-5', supaUrl:'', supaAnon:'',
             coachId:'sarge', coachNames:{} };
 function loadCfg(){
   try {
@@ -5860,12 +5861,19 @@ async function askDirect(question, history){
     headers: {
       'x-api-key': CFG.anthropicKey,
       'anthropic-version': '2023-06-01',
+      /* without this the browser is refused outright — the API blocks direct
+         calls from a page unless you opt in to it explicitly */
       'anthropic-dangerous-direct-browser-access': 'true',
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: CFG.model || 'claude-sonnet-5',
-      max_tokens: 700,
+      model: CFG.model || 'claude-opus-5',
+      /* Thinking is on by default on these models and thinking tokens count
+         against max_tokens, so a tight cap returns an empty answer rather than
+         a short one. Give it room and keep the replies short with low effort
+         plus the word limit in the system prompt. */
+      max_tokens: 4000,
+      output_config: { effort: 'low' },
       system: systemFor(),
       messages: history.concat([{ role:'user',
         content: 'My current training data:\n' + coachContext() + '\n\nQuestion: ' + question }])
@@ -5874,9 +5882,18 @@ async function askDirect(question, history){
   const j = await res.json().catch(() => null);
   if (!res.ok){
     const m = (j && j.error && j.error.message) || ('HTTP ' + res.status);
-    throw new Error(res.status === 401 ? 'That API key was rejected — check it in Coach setup.' : m);
+    if (res.status === 401) throw new Error('That API key was rejected — check it in Coach setup.');
+    if (res.status === 429) throw new Error('Rate limited. Give it a minute and ask again.');
+    if (res.status === 400 && /credit|balance/i.test(m)) throw new Error('Your API account is out of credit.');
+    throw new Error(m);
   }
-  return (j.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+  /* a refusal comes back as a normal 200 with nothing in content */
+  if (j && j.stop_reason === 'refusal')
+    throw new Error('The model declined that one. If it was about pain, medication or bloodwork, ' +
+                    'that is a question for a doctor rather than a coach.');
+  const text = (j.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+  if (!text) throw new Error('The model returned nothing. Try asking again.');
+  return j.stop_reason === 'max_tokens' ? text + '\n\n(cut off there — ask me to carry on)' : text;
 }
 async function askProxy(question, history){
   if (!SESSION) throw new Error('Sign in first to use the coach.');
@@ -5896,7 +5913,18 @@ function sandboxHint(msg){
 async function coachAsk(question){
   const mode = coachMode();
   if (mode === 'off'){ openAskSheet(question); return; }
-  const history = chat.slice(-8).map(m => ({ role: m.role, content: m.text }));
+  /* Only real turns go back as history: an error bubble is ours, not the
+     model's, and the API rejects two user messages in a row. */
+  const history = [];
+  chat.filter(m => !m.err).forEach(m => {
+    const role = m.role === 'user' ? 'user' : 'assistant';
+    if (history.length && history[history.length-1].role === role) history.pop();
+    history.push({ role, content: m.text });
+  });
+  while (history.length && history[0].role !== 'user') history.shift();
+  while (history.length && history[history.length-1].role === 'user') history.pop();
+  history.splice(0, Math.max(0, history.length - 8));            /* keep it cheap */
+  while (history.length && history[0].role !== 'user') history.shift();
   chat.push({ role:'user', text: question });
   chatBusy = true; render();
   try {
@@ -6066,8 +6094,9 @@ VIEWS.coach = function(){
   '<div class="panel pad tiny muted">' +
     (live
       ? 'Answers use your logged numbers — this week\'s sets, your lifts, your macros and your split.'
-      : 'Not connected yet, so questions get packaged with your numbers for you to paste into Claude. ' +
-        '<button class="sec-link" data-act="go" data-v="setup">Set it up</button> and answers appear here instead.') +
+      : 'The coach is switched off, so a question gets packaged up with your numbers for you to paste ' +
+        'into Claude yourself. <button class="sec-link" data-act="go" data-v="setup">Switch it on</button> ' +
+        'with an API key and the answers appear here instead. The key stays in this browser.') +
   '</div>';
 
   out += coachRoster();

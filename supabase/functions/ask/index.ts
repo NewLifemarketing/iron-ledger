@@ -10,8 +10,9 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const MODEL = "claude-sonnet-5";
-const MAX_TOKENS = 700;
+const MODEL = "claude-opus-5";
+/* thinking is on by default and its tokens count here, so leave room */
+const MAX_TOKENS = 4000;
 const MAX_QUESTION = 2000;
 const MAX_CONTEXT = 6000;
 
