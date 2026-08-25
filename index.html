@@ -4958,6 +4958,16 @@ VIEWS.profile = function(){
   '</div>' +
   '<div class="panel pad tiny muted">Macro targets add up to ' + num(t.p*4 + t.c*4 + t.f*9, 0) + ' kcal against a ' + t.kcal + ' kcal goal.</div>';
 
+  out += '<div class="sec"><span class="eyebrow">Coach</span></div>' +
+    '<button class="lrow slim" data-act="go" data-v="setup">' +
+      '<span class="grow" style="text-align:left"><span class="ln">Use a cloud model instead</span>' +
+      '<span class="lm">' + (coachMode() === 'local'
+        ? 'Running on this device. Sharper answers need an API key or your own server.'
+        : coachMode() === 'off'
+          ? 'No WebGPU here — a key or your own server would answer inline.'
+          : 'Configured. Tap to change or clear it.') + '</span></span>' +
+      '<span style="width:17px;color:var(--ink-3)">' + I.chev + '</span></button>';
+
   out += '<div class="sec"><span class="eyebrow">Routines · ' + DB.templates.length + '</span>' +
     '<button class="sec-link" data-act="newTpl">Build one</button></div>' +
   '<div class="stack-sm">' + DB.templates.map(tp =>
@@ -5166,9 +5176,76 @@ function saveCfg(){
   SUPA.url = CFG.supaUrl || SUPA.url;
   SUPA.anon = CFG.supaAnon || SUPA.anon;
 }
+/* ============================================================
+   THE ON-DEVICE COACH
+
+   The whole point: no API key, no server, no account. WebLLM
+   compiles a small instruct model to WebGPU and runs it in this
+   tab. The weights download once (~1 GB) into the browser cache
+   and it works offline after that — including in the gym with no
+   signal, which is the one place this app is actually used.
+
+   It is a 1B model, so it is not as sharp as Opus. It is,
+   however, actually here. A key still buys the better answer;
+   that lives in Profile now rather than in the way.
+   ============================================================ */
+const LLM = {
+  engine: null,
+  status: 'idle',            /* idle | loading | ready | error */
+  pct: 0,
+  err: '',
+  model: 'Llama-3.2-1B-Instruct-q4f16_1-MLC',
+  cdn: 'https://esm.run/@mlc-ai/web-llm'
+};
+const webgpuOk = () => typeof navigator !== 'undefined' && !!navigator.gpu;
+
+async function llmLoad(){
+  if (LLM.engine) return LLM.engine;
+  if (!webgpuOk()) throw new Error('This browser has no WebGPU, so the coach cannot run on the device here.');
+  if (LLM.status === 'loading') return null;
+  LLM.status = 'loading'; LLM.pct = 0; LLM.err = ''; render();
+  try {
+    const webllm = await import(LLM.cdn);
+    LLM.engine = await webllm.CreateMLCEngine(LLM.model, {
+      initProgressCallback: (p) => {
+        LLM.pct = typeof p.progress === 'number' ? p.progress : LLM.pct;
+        if (ROUTE.tab === 'coach') render();
+      }
+    });
+    LLM.status = 'ready'; LLM.pct = 1; render();
+    return LLM.engine;
+  } catch(e){
+    LLM.status = 'error';
+    LLM.err = /import|fetch|network/i.test(e.message)
+      ? 'Could not fetch the model. That needs a connection the first time only.'
+      : e.message;
+    render();
+    throw new Error(LLM.err);
+  }
+}
+ACTS.llmLoad = () => { llmLoad().catch(() => {}); };
+
+async function askLocal(question, history){
+  const engine = await llmLoad();
+  if (!engine) throw new Error('Still downloading — ask again when it finishes.');
+  const r = await engine.chat.completions.create({
+    messages: [{ role:'system', content: systemFor() }].concat(history, [{
+      role:'user',
+      content: 'My current training data:\n' + coachContext() + '\n\nQuestion: ' + question
+    }]),
+    temperature: 0.6,
+    max_tokens: 500
+  });
+  const text = ((r.choices && r.choices[0] && r.choices[0].message.content) || '').trim();
+  if (!text) throw new Error('The model returned nothing. Ask again.');
+  return text;
+}
+
+/* a key or a server wins if configured; otherwise this device does it */
 const coachMode = () =>
   CFG.coach === 'direct' && CFG.anthropicKey ? 'direct'
   : CFG.coach === 'proxy' && SUPA.url && SUPA.anon ? 'proxy'
+  : webgpuOk() ? 'local'
   : 'off';
 const cloudOn = () => !!(SUPA.url && SUPA.anon);
 
@@ -6057,7 +6134,9 @@ async function coachAsk(question){
   chat.push({ role:'user', text: question });
   chatBusy = true; render();
   try {
-    const reply = mode === 'direct' ? await askDirect(question, history) : await askProxy(question, history);
+    const reply = mode === 'direct' ? await askDirect(question, history)
+                : mode === 'proxy'  ? await askProxy(question, history)
+                :                     await askLocal(question, history);
     chat.push({ role:'assistant', text: reply || 'No answer came back.' });
   } catch(e){
     chat.push({ role:'assistant', text: sandboxHint(e.message), err:true });
@@ -6239,7 +6318,8 @@ ACTS.cfgTest = async () => {
 };
 
 VIEWS.coach = function(){
-  const live = coachMode() !== 'off';
+  const mode = coachMode();
+  const live = mode !== 'off';
   let out =
   '<div class="between wrap">' +
     '<div class="row" style="gap:11px;min-width:0">' + coachBust(activeCoach(), 46) +
@@ -6251,45 +6331,34 @@ VIEWS.coach = function(){
   '<div class="panel pad tiny muted">' +
     (live
       ? 'Answers use your logged numbers — this week\'s sets, your lifts, your macros and your split.'
-      : 'Not switched on yet. Ask anything and it hands the question, with your numbers attached, straight ' +
-        'to ChatGPT or Claude in a new tab — no key, no cost beyond whatever you already pay them. ' +
-        'Add a key below instead and the answers appear inline here.') +
+      : 'Ask anything and it hands the question, with your numbers attached, straight to ChatGPT or ' +
+        'Claude in a new tab.') +
   '</div>';
 
-
-  /* Switching the coach on used to mean visiting a separate setup screen. It
-     is one field, so it lives here instead and disappears once it is set. */
-  if (!live) out +=
-    '<div class="panel pad stack-sm" style="border-color:var(--acc)">' +
-      '<div class="eyebrow" style="color:var(--acc-hi)">Turn the coach on</div>' +
-      '<div class="tiny muted">Paste an Anthropic API key from ' +
-        '<b>console.anthropic.com &rarr; API keys</b>. It is stored in this browser only — never in the ' +
-        'page, never in the repository, never sent anywhere but Anthropic.</div>' +
-      '<div class="field"><label>API key</label>' +
-        '<input class="inp" id="ckey" type="password" autocomplete="off" spellcheck="false" ' +
-          'placeholder="sk-ant-..." value="' + esc(CFG.anthropicKey || '') + '"></div>' +
-      '<div class="field"><label>Model</label><select class="inp" id="cmodel">' +
-        MODELS.map(m => '<option value="' + m.id + '"' + (CFG.model === m.id ? ' selected' : '') + '>' +
-          esc(m.n) + ' — ' + esc(m.d) + '</option>').join('') + '</select></div>' +
-      '<button class="btn btn-pri btn-block" data-act="coachOn">Use this key</button>' +
-      (coachTestMsg ? '<div class="tiny ' + (coachTestOk ? 'muted' : 'hot') + '">' + esc(coachTestMsg) + '</div>' : '') +
-      '<hr class="hr" style="margin:4px 0">' +
-      '<div class="mini dim">Or run it through your own Supabase project instead, and the key lives on the ' +
-        'server rather than in every browser you use. Deploy <b>supabase/DEPLOY.md</b> from the repository, ' +
-        'then paste the two project values here — after that no device ever asks for a key again.</div>' +
-      '<div class="grid2" style="gap:8px">' +
-        '<div class="field"><label>Project URL</label>' +
-          '<input class="inp" id="csupa" placeholder="https://xxx.supabase.co" value="' + esc(CFG.supaUrl || '') + '"></div>' +
-        '<div class="field"><label>Anon key</label>' +
-          '<input class="inp" id="csupak" placeholder="eyJhbGci..." value="' + esc(CFG.supaAnon || '') + '"></div>' +
-      '</div>' +
-      '<button class="btn btn-block" data-act="coachProxy">Use my own server</button>' +
-    '</div>';
+  /* The coach runs on this device by default. No panel, no key, no server —
+     just a status line saying where the answer is coming from. */
+  if (mode === 'local') out +=
+    '<div class="between panel pad tiny muted">' +
+      '<span>' + (LLM.engine
+        ? 'Running on this device. Nothing leaves the phone.'
+        : LLM.status === 'loading'
+          ? 'Downloading the coach — ' + Math.round(LLM.pct * 100) + '%. One time only.'
+          : 'Runs on this device. Your first question downloads the model once (about 1 GB), then it is cached and works offline.') +
+      '</span>' +
+      (LLM.engine ? '' : '<button class="sec-link" data-act="llmLoad">Get it now</button>') +
+    '</div>' +
+    (LLM.status === 'loading'
+      ? '<div class="bar"><i style="width:' + r1(LLM.pct * 100) + '%"></i></div>' : '') +
+    (LLM.err ? '<div class="panel pad tiny hot">' + esc(LLM.err) + '</div>' : '');
+  else if (mode === 'off') out +=
+    '<div class="panel pad tiny muted">This browser has no WebGPU, so the on-device coach cannot run here. ' +
+      'Ask anything and it hands the question to ChatGPT or Claude in a new tab instead. Chrome or Edge on ' +
+      'desktop will run it inline.</div>';
   else out +=
     '<div class="between panel pad tiny muted">' +
       '<span>Answering with <b>' + esc((MODELS.find(m => m.id === CFG.model) || MODELS[0]).n) + '</b>' +
-        (CFG.coach === 'proxy' ? ' through your own server' : ', key held in this browser') + '</span>' +
-      '<button class="sec-link" data-act="coachOff">Turn off</button>' +
+        (mode === 'proxy' ? ' through your own server' : ', key held in this browser') + '</span>' +
+      '<button class="sec-link" data-act="coachOff">Use the on-device coach</button>' +
     '</div>';
   out += coachRoster();
 
@@ -6357,19 +6426,21 @@ ACTS.coachProxy = () => {
   render();
 };
 ACTS.coachOff = () => {
-  CFG.coach = 'off'; CFG.anthropicKey = ''; saveCfg();
-  coachTestMsg = ''; coachTestOk = null; toast('Coach switched off'); render();
+  CFG.coach = 'off'; CFG.anthropicKey = ''; CFG.supaUrl = ''; CFG.supaAnon = '';
+  SUPA.url = ''; SUPA.anon = ''; saveCfg();
+  coachTestMsg = ''; coachTestOk = null;
+  toast(webgpuOk() ? 'Back to the on-device coach' : 'Cloud coach switched off'); render();
 };
 ACTS.chatSend = () => {
   const el = document.getElementById('chatIn');
   const q = (el ? el.value : '').trim();
   if (!q){ toast('Type a question first'); return; }
   if (el) el.value = '';
-  if (cloudOn() && SESSION) coachAsk(q); else openAskSheet(q);
+  coachAsk(q);          /* coachAsk itself falls back to the handoff sheet */
 };
 ACTS.chatQuick = (el) => {
   const q = el.dataset.q;
-  if (cloudOn() && SESSION) coachAsk(q); else openAskSheet(q);
+  coachAsk(q);
 };
 ACTS.chatClear = () => { chat = []; render(); };
 
