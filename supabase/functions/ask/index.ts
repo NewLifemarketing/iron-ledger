@@ -84,6 +84,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: MODEL,
         max_tokens: MAX_TOKENS,
+        output_config: { effort: "low" },
         system: payload.system ?? "You are a strength and physique coach. Be concrete and brief.",
         messages,
       }),
@@ -94,13 +95,19 @@ Deno.serve(async (req) => {
       const msg = body?.error?.message ?? `Anthropic returned ${res.status}`;
       return json({ error: msg }, 502);
     }
+    // A refusal is a normal 200 with nothing in content — say so rather than
+    // handing the app an empty bubble.
+    if (body.stop_reason === "refusal")
+      return json({ reply: "The model declined that one. If it was about pain, medication or bloodwork, that is a question for a doctor rather than a coach." });
+
     const reply = (body.content ?? [])
       .filter((b: { type: string }) => b.type === "text")
       .map((b: { text: string }) => b.text)
       .join("\n")
       .trim();
 
-    return json({ reply: reply || "No answer came back.", usage: body.usage ?? null });
+    const cut = body.stop_reason === "max_tokens" ? "\n\n(cut off there — ask me to carry on)" : "";
+    return json({ reply: (reply || "No answer came back.") + cut, usage: body.usage ?? null });
   } catch (e) {
     return json({ error: `Could not reach the model: ${(e as Error).message}` }, 502);
   }

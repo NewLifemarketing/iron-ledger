@@ -6162,6 +6162,17 @@ VIEWS.coach = function(){
           esc(m.n) + ' — ' + esc(m.d) + '</option>').join('') + '</select></div>' +
       '<button class="btn btn-pri btn-block" data-act="coachOn">Use this key</button>' +
       (coachTestMsg ? '<div class="tiny ' + (coachTestOk ? 'muted' : 'hot') + '">' + esc(coachTestMsg) + '</div>' : '') +
+      '<hr class="hr" style="margin:4px 0">' +
+      '<div class="mini dim">Or run it through your own Supabase project instead, and the key lives on the ' +
+        'server rather than in every browser you use. Deploy <b>supabase/DEPLOY.md</b> from the repository, ' +
+        'then paste the two project values here — after that no device ever asks for a key again.</div>' +
+      '<div class="grid2" style="gap:8px">' +
+        '<div class="field"><label>Project URL</label>' +
+          '<input class="inp" id="csupa" placeholder="https://xxx.supabase.co" value="' + esc(CFG.supaUrl || '') + '"></div>' +
+        '<div class="field"><label>Anon key</label>' +
+          '<input class="inp" id="csupak" placeholder="eyJhbGci..." value="' + esc(CFG.supaAnon || '') + '"></div>' +
+      '</div>' +
+      '<button class="btn btn-block" data-act="coachProxy">Use my own server</button>' +
     '</div>';
   else out +=
     '<div class="between panel pad tiny muted">' +
@@ -6220,6 +6231,19 @@ ACTS.coachOn = async (el) => {
     CFG.anthropicKey = savedKey; CFG.model = savedModel; CFG.coach = savedMode;
     coachTestMsg = sandboxHint(e.message); coachTestOk = false; render();
   }
+};
+ACTS.coachProxy = () => {
+  const u = ((document.getElementById('csupa') || {}).value || '').trim().replace(/\/$/, '');
+  const a = ((document.getElementById('csupak') || {}).value || '').trim();
+  if (!u || !a){ coachTestMsg = 'Both the project URL and the anon key are needed.'; coachTestOk = false; render(); return; }
+  if (!/^https:\/\/[^/]+\.supabase\.co$/.test(u)){
+    coachTestMsg = 'That does not look like a Supabase project URL.'; coachTestOk = false; render(); return;
+  }
+  CFG.supaUrl = u; CFG.supaAnon = a; CFG.coach = 'proxy'; CFG.anthropicKey = '';
+  saveCfg();
+  coachTestMsg = ''; coachTestOk = true;
+  toast(SESSION ? 'Coach is live through your server' : 'Server set — sign in to your account to use it');
+  render();
 };
 ACTS.coachOff = () => {
   CFG.coach = 'off'; CFG.anthropicKey = ''; saveCfg();
