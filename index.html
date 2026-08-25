@@ -5163,7 +5163,7 @@ const MODELS = [
   { id:'claude-haiku-4-5', n:'Haiku 4.5', d:'Cheapest. Fine for straightforward questions' }
 ];
 let CFG = { coach:'off', anthropicKey:'', model:'claude-opus-5', supaUrl:'', supaAnon:'',
-            coachId:'heavy', coachNames:{} };
+            coachId:'heavy', coachNames:{}, localModel:'Llama-3.2-1B-Instruct-q4f16_1-MLC' };
 function loadCfg(){
   try {
     const raw = localStorage.getItem(CFG_KEY);
@@ -5197,6 +5197,17 @@ const LLM = {
   model: 'Llama-3.2-1B-Instruct-q4f16_1-MLC',
   cdn: 'https://esm.run/@mlc-ai/web-llm'
 };
+/* Weights are the whole cost of this, so the size is the headline rather than a
+   footnote. Downloaded once, then cached and offline after that. */
+const LOCAL_MODELS = [
+  { id:'Llama-3.2-1B-Instruct-q4f16_1-MLC', n:'Llama 3.2 1B', mb:800,
+    d:'Best of the on-device options. Slowest to fetch the first time.' },
+  { id:'Qwen2.5-0.5B-Instruct-q4f16_1-MLC', n:'Qwen2.5 0.5B', mb:350,
+    d:'A reasonable middle. Quicker start.' },
+  { id:'SmolLM2-360M-Instruct-q4f16_1-MLC', n:'SmolLM2 360M', mb:250,
+    d:'Fastest start. Keeps answers simple.' }
+];
+const localModel = () => LOCAL_MODELS.find(m => m.id === CFG.localModel) || LOCAL_MODELS[0];
 const webgpuOk = () => typeof navigator !== 'undefined' && !!navigator.gpu;
 
 async function llmLoad(){
@@ -5206,7 +5217,7 @@ async function llmLoad(){
   LLM.status = 'loading'; LLM.pct = 0; LLM.err = ''; render();
   try {
     const webllm = await import(LLM.cdn);
-    LLM.engine = await webllm.CreateMLCEngine(LLM.model, {
+    LLM.engine = await webllm.CreateMLCEngine(localModel().id, {
       initProgressCallback: (p) => {
         LLM.pct = typeof p.progress === 'number' ? p.progress : LLM.pct;
         if (ROUTE.tab === 'coach') render();
@@ -5224,6 +5235,11 @@ async function llmLoad(){
   }
 }
 ACTS.llmLoad = () => { llmLoad().catch(() => {}); };
+ACTS.llmPick = (el) => {
+  if (LLM.engine) return;                 /* already loaded; switching means a reload */
+  CFG.localModel = el.value; saveCfg();
+  LLM.err = ''; render();
+};
 
 async function askLocal(question, history){
   const engine = await llmLoad();
@@ -6338,18 +6354,27 @@ VIEWS.coach = function(){
   /* The coach runs on this device by default. No panel, no key, no server —
      just a status line saying where the answer is coming from. */
   if (mode === 'local') out +=
-    '<div class="between panel pad tiny muted">' +
-      '<span>' + (LLM.engine
-        ? 'Running on this device. Nothing leaves the phone.'
-        : LLM.status === 'loading'
-          ? 'Downloading the coach — ' + Math.round(LLM.pct * 100) + '%. One time only.'
-          : 'Runs on this device. Your first question downloads the model once (about 1 GB), then it is cached and works offline.') +
-      '</span>' +
-      (LLM.engine ? '' : '<button class="sec-link" data-act="llmLoad">Get it now</button>') +
-    '</div>' +
-    (LLM.status === 'loading'
-      ? '<div class="bar"><i style="width:' + r1(LLM.pct * 100) + '%"></i></div>' : '') +
-    (LLM.err ? '<div class="panel pad tiny hot">' + esc(LLM.err) + '</div>' : '');
+    '<div class="panel pad stack-sm">' +
+      '<div class="between wrap" style="gap:8px">' +
+        '<span class="tiny muted" style="flex:1 1 200px">' + (LLM.engine
+          ? 'Running on <b>' + esc(localModel().n) + '</b>, on this device. Nothing leaves the phone and it works offline.'
+          : LLM.status === 'loading'
+            ? 'Fetching <b>' + esc(localModel().n) + '</b> — ' + Math.round(LLM.pct * 100) + '% of about ' +
+              localModel().mb + ' MB. Once only; it is cached after this.'
+            : 'Answers come from <b>' + esc(localModel().n) + '</b> running on this device. The first question ' +
+              'downloads about ' + localModel().mb + ' MB, once, then it works offline.') + '</span>' +
+        (LLM.engine || LLM.status === 'loading' ? ''
+          : '<button class="btn btn-sm btn-pri" data-act="llmLoad">Download now</button>') +
+      '</div>' +
+      (LLM.status === 'loading'
+        ? '<div class="bar"><i style="width:' + r1(LLM.pct * 100) + '%"></i></div>' : '') +
+      (LLM.err ? '<div class="tiny hot">' + esc(LLM.err) + '</div>' : '') +
+      (LLM.engine || LLM.status === 'loading' ? '' :
+        '<div class="field"><label>Model</label><select class="inp" data-act="llmPick">' +
+          LOCAL_MODELS.map(m => '<option value="' + m.id + '"' + (localModel().id === m.id ? ' selected' : '') +
+            '>' + esc(m.n) + ' — ' + m.mb + ' MB — ' + esc(m.d) + '</option>').join('') +
+        '</select></div>') +
+    '</div>';
   else if (mode === 'off') out +=
     '<div class="panel pad tiny muted">This browser has no WebGPU, so the on-device coach cannot run here. ' +
       'Ask anything and it hands the question to ChatGPT or Claude in a new tab instead. Chrome or Edge on ' +
