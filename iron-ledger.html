@@ -1151,6 +1151,77 @@ Pallof Press|abs||CB|1|0
 Side Plank|abs||BW|1|0
 Reverse Crunch|abs||BW|0|0
 Dragon Flag|abs||BW|0|0
+Barbell Floor Press|chest|tri,fdelt|BB|0|1
+Dumbbell Floor Press|chest|tri|DB|0|0
+Machine Incline Press|chest|fdelt,tri|MC|0|0
+Machine Decline Press|chest|tri|MC|0|0
+Cable Crossover (Standing)|chest|fdelt|CB|0|0
+Single-Arm Cable Fly|chest||CB|1|0
+Dumbbell Squeeze Press|chest|tri|DB|0|0
+Weighted Dip (Chest Lean)|chest|tri,fdelt|BW|0|0
+Deficit Push-Up|chest|tri,fdelt|BW|0|0
+Smith Machine Incline Press|chest|fdelt,tri|SM|0|0
+Barbell Pendlay Row|upback|lats,bi|BB|0|1
+Kroc Row|lats|upback,bi,fore|DB|1|0
+Chest-Supported T-Bar Row|upback|lats,bi|MC|0|0
+Single-Arm Cable Row|lats|upback,bi|CB|1|0
+Wide-Grip Pull-Up|lats|upback,bi|BW|0|0
+Weighted Chin-Up|lats|bi,upback|BW|0|0
+Straight-Arm Cable Pulldown|lats||CB|0|0
+Machine Pullover|lats||MC|0|0
+Half-Kneeling One-Arm Pulldown|lats|bi|CB|1|0
+Cable Shrug|traps|upback|CB|0|0
+Smith Machine Shrug|traps|upback|SM|0|0
+Snatch-Grip High Pull|traps|upback,rdelt|BB|0|1
+Weighted Back Extension|lback|glute,ham|MC|0|0
+Reverse Hyperextension|lback|glute,ham|BW|0|0
+Jefferson Curl|lback|ham|DB|0|0
+Bird Dog|lback|abs,glute|BW|1|0
+Seated Dumbbell Shoulder Press|fdelt|tri,sdelt|DB|0|0
+Leaning Cable Lateral Raise|sdelt||CB|1|0
+Dumbbell Lateral Raise (Seated)|sdelt||DB|0|0
+Cable Y-Raise|sdelt|rdelt|CB|0|0
+Behind-the-Back Cable Lateral|sdelt||CB|1|0
+Upright Row (Wide Grip)|sdelt|traps,bi|BB|0|1
+Dumbbell Upright Row|sdelt|traps|DB|0|0
+Band Lateral Raise|sdelt||BND|0|0
+Cable Reverse Fly|rdelt|upback|CB|0|0
+Bent-Over Dumbbell Reverse Fly|rdelt|upback|DB|0|0
+Face Pull (Rope)|rdelt|upback,traps|CB|0|0
+Prone Incline Reverse Fly|rdelt|upback|DB|0|0
+Band Pull-Apart|rdelt|upback|BND|0|0
+Barbell Curl (Wide Grip)|bi|fore|BB|0|1
+Dumbbell Spider Curl|bi||DB|0|0
+Cable Curl (Straight Bar)|bi|fore|CB|0|0
+Cross-Body Hammer Curl|bi|fore|DB|1|0
+Reverse EZ-Bar Curl|fore|bi|EZ|0|1
+Close-Grip Push-Up|tri|chest,fdelt|BW|0|0
+Cable Overhead Extension (Rope)|tri||CB|0|0
+Single-Arm Cable Kickback|tri||CB|1|0
+Machine Triceps Extension|tri||MC|0|0
+Dumbbell Tate Press|tri||DB|0|0
+Reverse-Grip Cable Pushdown|tri||CB|0|0
+Dead Hang|fore|lats|BW|0|0
+Hack Squat (Machine)|quad|glute,ham|MC|0|0
+Pendulum Squat|quad|glute|MC|0|0
+Belt Squat|quad|glute|MC|0|0
+Front Foot Elevated Split Squat|quad|glute|DB|1|0
+Cyclist Squat|quad||BB|0|1
+Single-Leg Lying Leg Curl|ham||MC|1|0
+Nordic Hamstring Curl|ham||BW|0|0
+Single-Leg Romanian Deadlift|ham|glute|DB|1|0
+Glute-Ham Raise|ham|glute,lback|BW|0|0
+Cable Pull-Through|glute|ham|CB|0|0
+Barbell Hip Thrust|glute|ham|BB|0|1
+Frog Pump|glute||BW|0|0
+Cossack Squat|add|quad,glute|BW|1|0
+Tibialis Raise|calf||BW|0|0
+Weighted Hanging Leg Raise|abs||BW|0|0
+Cable Crunch (Kneeling)|abs||CB|0|0
+Hollow Body Hold|abs||BW|0|0
+Cable Woodchop|abs||CB|1|0
+Weighted Decline Sit-Up|abs||MC|0|0
+Toes-to-Bar|abs|lats|BW|0|0
 `.trim();
 </script>
 
@@ -1486,6 +1557,17 @@ function hydrate(){
   for (const k in d.profile) if (DB.profile[k] === undefined) DB.profile[k] = d.profile[k];
   for (const k in d.profile.targets) if (DB.profile.targets[k] === undefined) DB.profile.targets[k] = d.profile.targets[k];
   if (!DB.exercises.length) DB.exercises = seedExercises();
+  else {
+    /* Fold in any exercise added to the library since this record was made.
+       Matched on name so a user's own entries and their ids are untouched —
+       without this, everyone who already had the app would never see a new
+       movement again. */
+    const have = {};
+    DB.exercises.forEach(e => have[e.name.trim().toLowerCase()] = 1);
+    seedExercises().forEach(e => {
+      if (!have[e.name.trim().toLowerCase()]) DB.exercises.push(e);
+    });
+  }
   if (!DB.foods.length) DB.foods = seedFoods();
   /* the split holds template ids, so it has to be built against this
      user's own routines rather than copied from a fresh database */
@@ -5988,28 +6070,56 @@ async function coachAsk(question){
 }
 
 /* no server: hand the question and context over for pasting into Claude */
+/* No key, no server, no cost: copy the question and your numbers straight into
+   whichever assistant you already pay for. The two buttons prefill a new chat
+   by URL, and the text is put on the clipboard first — a long context can
+   exceed what a browser will carry in a query string, and pasting always
+   works. This is the honest answer to "without an API". */
 function openAskSheet(question){
-  const full = coachContext() + '\n\nQuestion: ' + (question || '');
+  const q = (question || '').trim();
+  const full = coachContext() + '\n\nQuestion: ' + q;
+  const prompt = systemFor().split('\n')[0] + '\n\n' + full;
+  const open = (base) => {
+    const url = base + encodeURIComponent(prompt);
+    /* ~6k of URL is where browsers start truncating; fall back to a bare chat
+       and let the clipboard carry it */
+    window.open(url.length < 6000 ? url : base.replace(/[?&][a-z]+=$/, ''), '_blank', 'noopener');
+  };
   openSheet({
-    title:'Ask Claude', sub:'Your numbers, packaged up',
+    title:'Ask without a key', sub:'Your numbers, packaged up',
     body:'<div class="stack">' +
-      '<div class="tiny muted">There is no server behind this copy of the app, so it cannot answer directly. ' +
-        'Copy this and paste it to Claude — it includes your split, your sets, your lifts and your macros, ' +
-        'so the answer is about you and not about lifters in general.</div>' +
-      '<pre class="scanprompt" id="askBlob" style="max-height:240px">' + esc(full) + '</pre>' +
+      '<div class="tiny muted">The coach is not switched on, so this hands the question to an assistant you ' +
+        'already have open instead. It carries your split, your sets, your lifts and your macros, so the ' +
+        'answer is about you rather than about lifters in general. Nothing is sent from here — the button ' +
+        'just opens a new chat with the text in it, and it is on your clipboard either way.</div>' +
+      '<div class="row" style="gap:8px">' +
+        '<button class="btn grow" data-a="gpt">Open in ChatGPT</button>' +
+        '<button class="btn grow" data-a="cl">Open in Claude</button>' +
+      '</div>' +
+      '<pre class="scanprompt" id="askBlob" style="max-height:220px">' + esc(full) + '</pre>' +
     '</div>',
     foot:'<button class="btn grow" data-a="c">Close</button>' +
          '<button class="btn btn-pri grow" data-a="copy">' + I.copy + ' Copy it all</button>',
     mount(root, inst){
-      root.querySelector('[data-a="c"]').onclick = () => inst.close();
-      root.querySelector('[data-a="copy"]').onclick = async () => {
-        try { await navigator.clipboard.writeText(full); toast('Copied — paste it to Claude'); }
+      const copy = async (msg) => {
+        try { await navigator.clipboard.writeText(prompt); toast(msg || 'Copied'); return true; }
         catch(e){
           const pre = root.querySelector('#askBlob');
           const rng = document.createRange(); rng.selectNodeContents(pre);
           const sel = getSelection(); sel.removeAllRanges(); sel.addRange(rng);
           toast('Selected — copy with your keyboard');
+          return false;
         }
+      };
+      root.querySelector('[data-a="c"]').onclick = () => inst.close();
+      root.querySelector('[data-a="copy"]').onclick = () => copy('Copied — paste it into any assistant');
+      root.querySelector('[data-a="gpt"]').onclick = async () => {
+        await copy('Copied too, in case it is trimmed');
+        open('https://chatgpt.com/?q=');
+      };
+      root.querySelector('[data-a="cl"]').onclick = async () => {
+        await copy('Copied too, in case it is trimmed');
+        open('https://claude.ai/new?q=');
       };
     }
   });
@@ -6141,8 +6251,9 @@ VIEWS.coach = function(){
   '<div class="panel pad tiny muted">' +
     (live
       ? 'Answers use your logged numbers — this week\'s sets, your lifts, your macros and your split.'
-      : 'Not switched on yet — a question gets packaged up with your numbers for you to paste into ' +
-        'Claude yourself. Add a key below and the answers appear here instead.') +
+      : 'Not switched on yet. Ask anything and it hands the question, with your numbers attached, straight ' +
+        'to ChatGPT or Claude in a new tab — no key, no cost beyond whatever you already pay them. ' +
+        'Add a key below instead and the answers appear inline here.') +
   '</div>';
 
 
