@@ -1365,20 +1365,20 @@ Zero-Cal Sweetener|1 packet|0|0|1|0|0|Condiment
 /* ---------------- routine templates ---------------- */
 const TPL_SEED = [
   { name:'Push — Chest / Shoulders / Triceps', tag:'PPL', ex:[
-    ['Barbell Incline Bench Press',2,'6-8'],['Dumbbell Bench Press',2,'6-8'],
-    ['Machine Shoulder Press',2,'6-8'],['Cable Fly (Mid)',2,'6-8'],
-    ['Dumbbell Lateral Raise',2,'6-8'],['Rope Pushdown',2,'6-8'],
-    ['Overhead Cable Extension',2,'6-8']]},
+    ['Smith Machine Incline Press',2,'6-8'],['Pec Deck',2,'6-8'],
+    ['Machine Chest Press',2,'6-8'],['Machine Shoulder Press',2,'6-8'],
+    ['Dumbbell Lateral Raise',2,'6-8'],['Single-Arm Pushdown',2,'6-8'],
+    ['Rope Pushdown',2,'6-8']]},
   { name:'Pull — Back / Rear Delts / Biceps', tag:'PPL', ex:[
-    ['Weighted Pull-Up',2,'6-8'],['Barbell Row',2,'6-8'],
-    ['Seated Cable Row',2,'6-8'],['Straight-Arm Pulldown',2,'6-8'],
-    ['Cable Face Pull',2,'6-8'],['EZ Bar Curl',2,'6-8'],
-    ['Incline Dumbbell Curl',2,'6-8']]},
+    ['Single-Arm Lat Pulldown',2,'6-8'],['T-Bar Row',2,'6-8'],
+    ['Pull-Up',2,'6-8'],['Machine Row',2,'6-8'],
+    ['Hammer Curl',2,'6-8'],['Machine Preacher Curl',2,'6-8'],
+    ['Barbell Curl',2,'6-8']]},
   { name:'Legs & Abs — Quads / Hams / Calves / Core', tag:'PPL', ex:[
-    ['Barbell Back Squat',2,'6-8'],['Romanian Deadlift',2,'6-8'],
-    ['Leg Press',2,'6-8'],['Lying Leg Curl',2,'6-8'],
-    ['Leg Extension',2,'6-8'],['Standing Calf Raise',2,'6-8'],
-    ['Cable Crunch',2,'6-8'],['Hanging Leg Raise',2,'6-8']]},
+    ['Leg Extension',2,'6-8'],['Leg Press',2,'6-8'],
+    ['Standing Calf Raise',2,'6-8'],['Hip Adduction Machine',2,'6-8'],
+    ['Hip Abduction Machine',2,'6-8'],['Seated Leg Curl',2,'6-8'],
+    ['Hanging Leg Raise',2,'6-8'],['Machine Crunch',2,'6-8']]},
   { name:'Upper Body — Strength', tag:'Upper/Lower', ex:[
     ['Barbell Bench Press',2,'6-8'],['Barbell Row',2,'6-8'],
     ['Barbell Overhead Press',2,'6-8'],['Lat Pulldown',2,'6-8'],
@@ -1569,6 +1569,45 @@ function hydrate(){
     });
   }
   if (!DB.foods.length) DB.foods = seedFoods();
+  /* Put the corrected exercises on a stock PPL routine saved before they were
+     fixed. The seeded movements were not the ones actually being trained, so
+     every push day started by editing them out -- and that edit lived on the
+     session, not the routine, so the wrong list came back the next push day.
+     Rewriting the routine is the only thing that makes the auto-fill right.
+
+     A routine is rewritten only while it still holds the exact list it was
+     seeded with; the moment it differs it is the user's own and is left alone.
+     That content match is also what stops this running twice, so it needs no
+     flag on the record -- and a flag would not work here anyway: anything in
+     freshDb gets backfilled by the key loop above before this could read it
+     (same trap documented on themeSet below). */
+  (function correctStockPPL(){
+    const V1 = {
+      'Push — Chest / Shoulders / Triceps':
+        ['Barbell Incline Bench Press','Dumbbell Bench Press','Machine Shoulder Press',
+         'Cable Fly (Mid)','Dumbbell Lateral Raise','Rope Pushdown','Overhead Cable Extension'],
+      'Pull — Back / Rear Delts / Biceps':
+        ['Weighted Pull-Up','Barbell Row','Seated Cable Row','Straight-Arm Pulldown',
+         'Cable Face Pull','EZ Bar Curl','Incline Dumbbell Curl'],
+      'Legs & Abs — Quads / Hams / Calves / Core':
+        ['Barbell Back Squat','Romanian Deadlift','Leg Press','Lying Leg Curl',
+         'Leg Extension','Standing Calf Raise','Cable Crunch','Hanging Leg Raise']
+    };
+    const nameOf = {}, idOf = {};
+    DB.exercises.forEach(e => { nameOf[e.id] = e.name; idOf[e.name] = e.id; });
+    TPL_SEED.forEach(seed => {
+      const was = V1[seed.name];
+      if (!was) return;
+      const tpl = DB.templates.find(t => t.stock && t.name === seed.name);
+      if (!tpl) return;
+      const now = (tpl.ex || []).map(x => nameOf[x.exId]);
+      if (now.length !== was.length || now.some((n, i) => n !== was[i])) return;
+      const next = seed.ex.map(([n, sets, reps]) => ({ exId: idOf[n], sets, reps }))
+                          .filter(x => x.exId);
+      /* all-or-nothing: a half-written routine is worse than the old one */
+      if (next.length === seed.ex.length) tpl.ex = next;
+    });
+  })();
   /* the split holds template ids, so it has to be built against this
      user's own routines rather than copied from a fresh database */
   /* The split holds template ids, so a copy taken from a fresh database points
