@@ -1077,8 +1077,8 @@ Dumbbell Row|lats|upback,bi|DB|1|0
 Chest-Supported Row|upback|lats,rdelt,bi|MC|0|0
 Seated Cable Row|upback|lats,bi|CB|0|0
 Wide-Grip Seated Row|upback|rdelt,lats|CB|0|0
-T-Bar Row|upback|lats,bi|BB|0|1
-Machine Row|upback|lats,bi|MC|0|0
+T-Bar Row|upback|lats,bi,rdelt|BB|0|1
+Machine Row|upback|lats,bi,rdelt|MC|0|0
 Meadows Row|lats|upback,bi|BB|1|1
 Inverted Row|upback|lats,bi|BW|0|0
 Cable Face Pull|rdelt|upback,traps|CB|0|0
@@ -1569,6 +1569,25 @@ function hydrate(){
     });
   }
   if (!DB.foods.length) DB.foods = seedFoods();
+  /* Give a saved record the rear-delt credit these two rows always earned.
+     Barbell Row, Chest-Supported Row and Wide-Grip Seated Row all list rdelt;
+     T-Bar Row and Machine Row did not, though they are the same pull. The gap
+     was in the tags, not the training -- a pull day built on those two sent
+     nothing to rear delts, so the chart stayed dark and the character's rear
+     delts never moved. Secondaries count half, so this is worth a set per row.
+
+     The fold-in above only adds exercises that are missing; it never revises
+     one already on the record, which is why the corrected tags need carrying
+     over explicitly. Only an untouched entry is rewritten: a custom exercise,
+     or one whose muscles the user has already changed, is left as it is. */
+  (function correctRowRearDelts(){
+    const WAS = 'lats,bi', NOW = ['lats','bi','rdelt'];
+    DB.exercises.forEach(e => {
+      if (e.custom || (e.name !== 'T-Bar Row' && e.name !== 'Machine Row')) return;
+      if ((e.sec || []).join(',') !== WAS) return;
+      e.sec = NOW.slice();
+    });
+  })();
   /* Put the corrected exercises on a stock PPL routine saved before they were
      fixed. The seeded movements were not the ones actually being trained, so
      every push day started by editing them out -- and that edit lived on the
